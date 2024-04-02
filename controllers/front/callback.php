@@ -27,14 +27,55 @@
 class CetelemCallbackModuleFrontController extends ModuleFrontController
 {
 
+
+    function test(){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 0);
+        error_reporting(E_ALL);
+        
+        $cart = new Cart(28);
+
+        echo '<pre>'; print_r($cart->id); echo '</pre>';
+        $id_order = Order::getOrderByCartId($cart->id);
+        $order = new Order($id_order);
+        $c_order_state = $order->getCurrentOrderState();
+        echo '<pre>'; print_r($c_order_state);
+        $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
+        $moduleName = $this->module->name;
+        $currency = $this->context->currency;
+        $customer = new Customer($cart->id_customer);
+        $mailVars = array();
+
+        $this->module->validateOrder(
+            $cart->id,
+            Configuration::getGlobalValue('PS_OS_CETELEM_PREAPPROVED'),
+            $total,
+            $moduleName,
+            '',
+            $mailVars,
+            (int)$currency->id,
+            false,
+            $customer->secure_key
+        );
+
+
+        die();
+    }
+    
     public function initContent()
     {
         parent::initContent();
+
+        //? esta funcion la iremos modificando para generar pruebas
+        // $this->test();
         $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
     }
 
     public function postProcess()
     {   
+
+        $file = _PS_MODULE_DIR_ . 'cetelem/tmp/transaction64e';
+        file_put_contents($file, "ring");
 
         $cetelem_ips = explode(",", Configuration::get('CETELEM_IPS'));
         if (!is_array($cetelem_ips)) {
@@ -496,7 +537,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 $mailVars = array();
                 
                 if ($CodResultado == '00') {
-				        		sleep(5);
+				        		sleep(2);
 				        }
 
                 $id_order = Order::getOrderByCartId($cart->id);
@@ -526,6 +567,8 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         );
                     }
                 } elseif ($CodResultado == '50') {
+                    sleep(7);
+
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                      PrestaShopLogger::addLog('Validamos pedido Cetelem 50', 1, null, 'Cart', (int) $cart->id, true);
                
