@@ -1,0 +1,58 @@
+
+Cetelem
+Author: eComm360 S.L.
+Contact: addons@ecomm360.es
+
+-----------------------------------------
+Historic changes for Cetelem
+-----------------------------------------
+VERSION PROPOSAL
+VERSION 17.5.4
+[-] MO: Cetelem: Important bug fixed. remove code getWidgetVariables.
+
+
+VERSION 17.2.7
+[-] MO: Cetelem: Important bug fixed. In the callback controller it was a cast to integer when we needed to maintain the entire string in the case it starts with 0, due later we will do a substr with 5 positions from the start of the string.
+
+VERSION 17.2.6.0
+[+] MO: Cetelem: Added a functionality to make the module widget ready, now is ready to hook in any hook.
+
+VERSION 17.2.5.7
+[-] MO: Cetelem: Show Cetelem calculator always in finance cms.
+[-] MO: Cetelem: Remove dynamic text for payment option.
+
+VERSION 17.2.5.6
+[-] MO: Cetelem: Bug fixed with stock in callback.
+
+VERSION 17.2.5.5
+[-] MO: Cetelem: Update stock for products when order have a not valid Cetelem status.
+
+VERSION 17.2.5.4
+[-] MO: Cetelem: Many bugs fixed.
+
+VERSION 17.2.5.3
+[+] MO: Cetelem: Added new functionality, chance to show the calculator up to 2 different hooks by a configuration option in the module configuration settings.
+[-] MO: Cetelem: Fixed problem with overrides.
+
+VERSION 17.2.5.2
+[-] MO: Cetelem: Various bugs fixed and disabled the options for ip restriction.
+
+VERSION 17.2.5.1
+[-] MO: Cetelem: Removed the behaviour or forcing the order to create.
+Added as well a new error message if the allow_url_fopen is not enabled.
+Updated all the colors for the Cetelem order states even if we had already the module installed before.
+
+VERSION 17.2.5.0
+[+] MO: Cetelem: Added all new functionalities: cron for legal texts every day, to forbid the acition of change order status when canceled for a Cetelem order.
+
+VERSION 17.0.4
+[-] MO: Cetelem: Force all the texts not found in csv to get the _ES code (the default one).
+
+VERSION 17.0.3
+[-] MO: Cetelem: Forced all the texts to get the color when the user changes it.
+
+VERSION 17.0.2
+[-] MO: Cetelem: Removed the option to set the url where to get the script from. Fixed a bug in the installation (at the first installation could crash at the function createhook and the next hooking actions won't occur so the module won't be hooked in the hooks, so won't appear in the web).
+
+VERSION 17.0.1
+Project: Original release for 1.7.

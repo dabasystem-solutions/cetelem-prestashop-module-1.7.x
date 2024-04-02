@@ -1,0 +1,6 @@
+Hola {firstname} {lastname},
+
+Su credito ha sido APROBADO.
+En breve le informaremos sobre su pedido.
+
+{shop_name}

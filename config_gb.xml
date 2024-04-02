@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>cetelem</name>
+    <displayName><![CDATA[Cetelem]]></displayName>
+    <version><![CDATA[17.2.5.2]]></version>
+    <description><![CDATA[Customers can pay with a credit.]]></description>
+    <author><![CDATA[eComm360 SL - www.ecomm360.es]]></author>
+    <tab><![CDATA[payments_gateways]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

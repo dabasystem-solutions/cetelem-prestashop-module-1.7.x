@@ -1,0 +1,304 @@
+/**
+* 2007-2016 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2016 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
+
+#cetelem_payment_button {
+    float: none;
+}
+
+#cetelem_payment_button a:hover {
+    background-color: #f6f6f6;
+}
+
+#cetelem_payment_button a {
+    background: #fbfbfb url("../img/logo-64x64.png") no-repeat scroll 15px 12px;
+}
+
+#cetelem_payment_button.campaign-on a {
+    background-position: 15px 20px;
+}
+
+#cetelem_payment_button a:after {
+    display: block;
+    content: "\f054";
+    position: absolute;
+    right: 15px;
+    margin-top: -11px;
+    top: 50%;
+    font-family: "FontAwesome";
+    font-size: 25px;
+    height: 22px;
+    width: 14px;
+    color: #777777;
+}
+
+#cetelem_payment_button.campaign-on span {
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+/** Aproved Page **/
+#aprovedblock h3 {
+    text-align: center;
+    color: #000000;
+    padding: 15px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+}
+
+#aprovedblock p {
+    text-align: center;
+    margin-top: 26px;
+    color: #111111;
+    line-height: 22px;
+}
+
+#aprovedblock p a {
+    font-weight: bold;
+    font-size: larger;
+    color: #000000;
+}
+
+/** Denied Page **/
+#deniedblock h3 {
+    text-align: center;
+    color: #FF4F48;
+    padding: 15px;
+    border: 1px solid #FF7E6B;
+    border-radius: 5px;
+}
+
+#deniedblock p {
+    text-align: center;
+    margin-top: 26px;
+    color: #111111;
+    line-height: 22px;
+}
+
+#deniedblock p a {
+    font-weight: bold;
+    font-size: larger;
+    color: #000000;
+}
+
+/** Hook Product Page **/
+section#calculadoraCetelem {
+    border-style: solid;
+    border-width: 1px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+section#calculadoraCetelem div#selFinanciacion p span {
+    font-weight: bold;
+}
+
+section#calculadoraCetelem div#selFinanciacion p a {
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+section#calculadoraCetelem input#cuotaMes {
+    max-width: 50px;
+    padding: 0px 0px 0px 4px;
+    max-height: 19px;
+    position: relative;
+    background: none;
+    border: none;
+}
+
+section#calculadoraCetelem div#infoFinanciacion {
+    margin-top: 10px;
+}
+
+section#calculadoraCetelem div#infoFinanciacion p {
+    margin-bottom: 0px;
+    font-size: smaller;
+}
+
+p.aoumtdue {
+    font-size: 13px !important;
+}
+
+/** Calculator page **/
+section#calcPageCetelem header {
+    padding-bottom: 0px;
+}
+
+section#calcPageCetelem div.row {
+    padding: 5px;
+    border: 2px solid #D0E3CC;
+}
+
+section#calcPageCetelem div.row.gris {
+    background-color: #D0E3CC;
+}
+
+section#calcPageCetelem div.row p {
+    margin: 0px;
+    font-size: 15px;
+    line-height: 25px;
+    color: #000000;
+}
+
+section#calcPageCetelem div.row span {
+    margin: 0px;
+    font-size: 12px;
+    line-height: 15px;
+    color: #000000;
+}
+
+section#calcPageCetelem div.row div.inputContainer {
+    position: relative;
+    padding: 6px 0;
+}
+
+section#calcPageCetelem div.inputContainer input, section#calcPageCetelem div.inputContainer select {
+    font-size: 15px;
+    height: 30px;
+}
+
+section#calcPageCetelem div.row input {
+    border: solid 1px #d6d4d4;
+    padding: 0px 6px;
+}
+
+section#calcPageCetelem div.row input + span, section#calcPageCetelem div.row select + span {
+    font-size: 15px;
+}
+
+section#calcPageCetelem section#calculateSection {
+    display: block;
+    float: none;
+    text-align: center;
+    clear: both;
+    padding-top: 14px;
+}
+
+section#calcPageCetelem section#calculateSection button {
+    font-size: 15px;
+    padding: 5px 15px;
+    margin-bottom: 10px;
+    background-color: #9ac270;
+    border-radius: 5px;
+    border: 2px solid #9ac270;
+    transition: ease all 0.2s;
+    -webkit-transition: ease all 0.2s;
+    -moz-transition: ease all 0.2s;
+    -o-transition: ease all 0.2s;
+}
+
+section#calcPageCetelem section#calculateSection button:hover {
+    background-color: #D0E3CC;
+}
+
+section#calcPageCetelem section#calculateSection button + p {
+    color: #000000;
+    font-size: 11px;;
+}
+
+section#legalInfo {
+    margin-top: 25px;
+}
+
+section#infoTextCalculator {
+    margin-bottom: 25px;
+    color: #000000;
+}
+
+body#product section select#mesesFinanciacion {
+    max-width: 38px;
+    padding: 0px 17px 0 3px;
+    background: url(../img/selectbackground.png) right 0 no-repeat;
+    border: none;
+    outline: none;
+    background-size: 17px;
+    height: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+div.cetelem-confirmation {
+    border: 1px solid #d6d4d4;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    font-size: 15px;
+    line-height: 23px;
+    color: #333;
+    padding: 23px 30px 23px 30px;
+}
+
+p.info {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.monthcaret:before {
+    color: #000;
+    border: 1px solid #ddd;
+    padding: 3px;
+    border-radius: 2px;
+}
+
+span.bigtext {
+    margin-left: 4px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.mediumtext b {
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
+section#calculadoraCetelem div#selFinanciacion p span.normaltext {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.infosymplus {
+    content: '+';
+}
+
+.infosymminus {
+    content: '-';
+}
+
+#infocetelem {
+    float: right;
+}
+
+.shortinfo small {
+    float: left;
+}
+
+/* Bug solve to remove arrow in select */
+select::-ms-expand {
+    display: none;
+}
+#eCalculadoraCetelemDiv{position:relative;}
