@@ -65,7 +65,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-
+        
         //? esta funcion la iremos modificando para generar pruebas
         // $this->test();
         $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');

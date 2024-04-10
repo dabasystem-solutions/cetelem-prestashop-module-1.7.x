@@ -104,9 +104,11 @@
         <input type="hidden" id="cetelem_albaran_new" name="Albaran" value="{$albaran}"/>
     {/if}
 </form>
+<script type="text/javascript">document.getElementById("cetelem_form").submit();</script>
+/* 
+En teoria lo tenian para cuando el check de crear preorden estaba activo
 {if $albaran || $mode == 'N'}
-    <script type="text/javascript">document.getElementById("cetelem_form").submit();</script>
-{/if}
+{/if} */
 
 <style type="text/css">
     .sameheight1, .sameheight2 {

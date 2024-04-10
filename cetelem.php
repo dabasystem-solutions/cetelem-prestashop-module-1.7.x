@@ -1199,42 +1199,21 @@ class Cetelem extends PaymentModule
         $conex_url = (Configuration::get(
             'CETELEM_ENV'
         )) ? self::CETELEM_URL_CONNECTION : self::CETELEM_URL_TEST_CONNECTION;
-        $form_next_url = Configuration::get('CETELEM_ORDER_CREATION') ? $this->context->link->getModuleLink(
+        
+        
+        // Redirigimos a payment2 siempre, aun que el check "Create order when access to Cetelem Environment" este activo o no 
+        $form_next_url = $this->context->link->getModuleLink(
             $this->name,
             'payment2',
             array('securekey' => Context::getContext()->customer->secure_key),
             true
-        ) : $conex_url;
+        );
 
-        //$mode = Configuration::get('CETELEM_MODALITY');
-        /*if ($mode == 'B') {
-          if (isset($fields['mode'])) {
-            if ($fields['mode'] == 3) {
-              $mode = 'G';
-            }
-          } else {
-            $mode = 'N';
-          }
-        }
-        if ($mode == 'G') {
-          $codproduct = "PMG";
-        } else {
-          $codproduct = "PM";
-        }*/
         $this->smarty->assign(
             $this->getTemplateVars()
         );
         $payment_text = '';
-        //    if ($mode == 'G') {
-//      $payment_text = Configuration::get('CETELEM_LEGAL_NOM_PAGO');
-//    }
-//    if ($payment_text == '' || !$payment_text) {
-//      if ($mode == 'G') {
-//        $payment_text = $this->l('Pay in easy installments: Cetelem Finance your purchase');
-//      } else {
-//        $payment_text = $this->l('Pay in easy installments: Cetelem Finance your purchase with interests');
-//      }
-//    }
+
         $payment_text = $this->l('Finance with Cetelem');
         //if ($mode == 'G') {
         $material = '499';

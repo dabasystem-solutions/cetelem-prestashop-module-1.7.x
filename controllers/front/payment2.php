@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2021 PrestaShop
  *
@@ -53,10 +54,10 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
         // $id_language = Tools::strtoupper($this->context->language->iso_code);
 
         $cart = $this->context->cart;
-        
+
         // Codigo para checkear que es el cliente quien valida el pedido
         $securekey = Tools::getValue('securekey');
-        if(!isset($securekey) || $securekey!=$this->context->customer->secure_key)
+        if (!isset($securekey) || $securekey != $this->context->customer->secure_key)
             exit;
 
         $ano = date('Y');
@@ -103,51 +104,6 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
         }
         $birthday = date('d/m/Y', strtotime($this->context->customer->birthday));
 
-        /*if (Tools::getValue('Modalidad')) {
-          $mode = Tools::getValue('Modalidad');
-        } else {
-          $mode = Configuration::get('CETELEM_MODALITY');
-        }*/
-
-        /*var_dump($mode);
-        die();*/
-
-        //var_dump($_POST);
-        //var_dump($_GET);
-        /*var_dump(Tools::getValue('Modalidad'));
-        die();*/
-
-        /*if (Configuration::get('CETELEM_MODALITY') == 'B') {
-          //ddd($_GET[0]['mode']);
-          if (count($_GET)) {
-            if (isset($_GET[0])) {
-              if (count($_GET[0]['mode'])) {
-                if (isset($_GET[0]['mode'])) {
-                  $mode = $_GET[0]['mode'];
-                } else {
-                  if (Configuration::get('CETELEM_LEGAL_NOM_PAGO') != '')  {
-                    $mode = 'G';
-                  } else {
-                    $mode = 'N';
-                  }
-                }
-              }
-            } else {
-              if (Configuration::get('CETELEM_LEGAL_NOM_PAGO') != '')  {
-                $mode = 'G';
-              } else {
-                $mode = 'N';
-              }
-            }
-          } else {
-            if (Configuration::get('CETELEM_LEGAL_NOM_PAGO') != '')  {
-              $mode = 'G';
-            } else {
-              $mode = 'N';
-            }
-          }
-        }*/
-
         //new calculator
 
         $cetelem_module = Module::getInstanceByName('cetelem');
@@ -180,7 +136,7 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
             )
         );
         $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_CONNECTION : Cetelem::CETELEM_URL_TEST_CONNECTION;
-        if(Tools::getValue('encuotas')){
+        if (Tools::getValue('encuotas')) {
             $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_NEWCONNECTION : Cetelem::CETELEM_URL_TEST_NEWCONNECTION;
         }
         $this->context->smarty->assign(
@@ -226,8 +182,6 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
 
         $this->context->smarty->assign(
             array(
-                /*'name_payment' => Configuration::get('CETELEM_CAMPAIGN_NOM_PAGO_' . $id_language),
-                'text_payment' => Configuration::get('CETELEM_CAMPAIGN_TEXTO_PAGO_' . $id_language),*/
                 'this_path' => $this->module->getPathUri(),
                 'this_path_bw' => $this->module->getPathUri(),
                 'this_path_ssl' => Tools::getShopDomainSsl(
@@ -240,10 +194,12 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
         $albaran = false;
 
         //$confirm_redirect = false;
+        $cart = $this->context->cart;
+
+        $albaran = Order::getOrderByCartId((int)$cart->id);
 
         if (Configuration::get('CETELEM_ORDER_CREATION')/* && Tools::getValue('orderConfirmed')*/) {
             //$confirm_redirect = true;
-            $cart = $this->context->cart;
             if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
                 Tools::redirect('index.php?controller=order&step=1');
             }
@@ -267,7 +223,6 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
             $currency = $this->context->currency;
             $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
             $mailVars = array();
-            //die($this->module->validateOrder($cart->id, Configuration::get('PS_OS_CETELEM_STANDBY'), $total, $this->module->name, '', $mailVars, (int) $currency->id, false, $customer->secure_key));
             $this->module->validateOrder(
                 $cart->id,
                 Configuration::getGlobalValue('PS_OS_CETELEM_STANDBY'),
@@ -277,27 +232,14 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
                 $mailVars,
                 (int)$currency->id,
                 false,
-                $customer->secure_key
+                1
             );
-            //as albaran we send the order id without any random or seconds number, because it will never be able retry the purchase, once the order is created, the cart is empty and can not retry it
-            $albaran = Order::getOrderByCartId((int)$cart->id);
-            /*$transact_id = $albaran;
-            $this->context->cookie->__set('cetelem_transact_id', $transact_id);*/
-            /*if ($albaran) {
-            $albaran = Order::getOrderByCartId((int)$cart->id);
-                die(Tools::jsonEncode(array('albaran' => $albaran)));
-            } else {
-                die(Tools::jsonEncode(array('albaran' => false)));
-            }*/
-            //die($this->module->validateOrder($cart->id, Configuration::get('PS_OS_CETELEM_STANDBY'), $total, $this->module->name, '', $mailVars, (int) $currency->id, false, $customer->secure_key));
-            //die();
-            /*$this->context->smarty->assign(array(
-              'confirm_redirect' => $confirm_redirect
-            ));*/
-        }/* elseif (Configuration::get('CETELEM_ORDER_CREATION')) {
-          $this->context->smarty->assign(array(
-           'conex_url' => '', 'orderConfirmed' => 1));
-        }*/
+
+        } else {
+            Context::getContext()->cookie->id_cart = '';
+        }
+
+
 
         $this->context->smarty->assign(
             array(
