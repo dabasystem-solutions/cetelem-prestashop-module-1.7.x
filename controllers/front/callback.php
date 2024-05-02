@@ -27,7 +27,6 @@
 class CetelemCallbackModuleFrontController extends ModuleFrontController
 {
 
-
     function test(){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 0);
@@ -65,7 +64,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-        
+
         //? esta funcion la iremos modificando para generar pruebas
         // $this->test();
         $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
@@ -98,11 +97,13 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                     $matched_ip = true;
                 }
             }
-            if (!$matched_ip) {
+            //!temporal
+            /* if (!$matched_ip) {
                 die();
-            }
+            } */
         }
         if (Tools::isSubmit('IdTransaccion') and Tools::isSubmit('codResultado')) {
+            
             //Crea log de la trasaccion la cual luego sera verificada.
             $string = Tools::getValue('IdTransaccion') . '|' . Tools::getValue('NSolicitud') . '|' . Tools::getValue(
                 'codResultado'
@@ -111,7 +112,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             $file = _PS_MODULE_DIR_ . 'cetelem/tmp/transaction' . Tools::getValue('IdTransaccion');
             if(is_numeric(Tools::getValue('IdTransaccion')))
                  file_put_contents($file, $string);
-
+                 
             if (Configuration::get('CETELEM_ORDER_CREATION')) {
                 $this->valdiationWithoutURL();
             } else {
@@ -121,6 +122,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 $id_cart = (int)Tools::substr(Tools::getValue('IdTransaccion'), 4);
                 //var_dump($id_cart);
                 //die();
+
                 $cart = new Cart($id_cart);
                 if (Order::getOrderByCartId($cart->id) > 0) {
                     $this->valdiationWithoutURL();
@@ -464,6 +466,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
 
     public function createWithoutURL()
     {
+
         //Load Cart Id from POST content
         //$id_cart = Order::getCartIdStatic((int)Tools::getValue('IdTransaccion'));
         $id_cart = (int)Tools::substr(Tools::getValue('IdTransaccion'), 4);
@@ -479,6 +482,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 true
             );
         }
+        
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
         /*$authorized = false;
         foreach (Module::getPaymentModules() as $module) {
@@ -536,9 +540,9 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
                 $mailVars = array();
                 
-                if ($CodResultado == '00') {
+                /* if ($CodResultado == '00') {
 				        		sleep(2);
-				        }
+				        } */
 
                 $id_order = Order::getOrderByCartId($cart->id);
 							 if($id_order)
@@ -550,7 +554,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                     $moduleName = 'encuotas';
                 }
                 if ($CodResultado == '00') {
-                		
+                   
                     if (Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED') != (int)$c_order_state->id) {
                         /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                          PrestaShopLogger::addLog('Validamos pedido Cetelem 00', 1, null, 'Cart', (int) $cart->id, true); 
