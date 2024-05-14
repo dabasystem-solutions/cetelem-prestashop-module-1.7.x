@@ -63,11 +63,33 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
     
     public function initContent()
     {
+        /* global $logFile; */
+
         parent::initContent();
 
         //? esta funcion la iremos modificando para generar pruebas
         // $this->test();
+
+        /* $logFile = $_SERVER['DOCUMENT_ROOT'].'/registro.log';
+        $url = $_SERVER['REQUEST_URI'];
+
+        $getParams = $_GET;
+        
+        $postParams = $_POST;
+        
+        $logMessage = "URL: $url\n";
+        $logMessage .= "GET Parameters: " . json_encode($getParams) . "\n";
+        $logMessage .= "POST Parameters: " . json_encode($postParams) . "\n";
+        
+        $this->writeToLog($logMessage); */
+
         $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
+    }
+
+    // Función para escribir en el archivo de registro
+    public function writeToLog($message) {
+        global $logFile;
+        file_put_contents($logFile, $message . PHP_EOL, FILE_APPEND);
     }
 
     public function postProcess()
@@ -556,7 +578,6 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 if ($CodResultado == '00') {
                    
                     if (Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED') != (int)$c_order_state->id) {
-                        /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                          PrestaShopLogger::addLog('Validamos pedido Cetelem 00', 1, null, 'Cart', (int) $cart->id, true); 
                         $this->module->validateOrder(
                             $cart->id,
@@ -571,7 +592,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         );
                     }
                 } elseif ($CodResultado == '50') {
-                    sleep(7);
+                   /*  sleep(7); */
 
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                      PrestaShopLogger::addLog('Validamos pedido Cetelem 50', 1, null, 'Cart', (int) $cart->id, true);

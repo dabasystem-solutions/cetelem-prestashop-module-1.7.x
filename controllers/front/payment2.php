@@ -28,8 +28,13 @@
 /**
  * @since 1.5.0
  */
+
+
+
 class CetelemPayment2ModuleFrontController extends ModuleFrontController
 {
+
+    
 
     public $ssl = true;
     public $display_column_left = false;
@@ -50,6 +55,7 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
      */
     public function initContent()
     {
+        
         parent::initContent();
         // $id_language = Tools::strtoupper($this->context->language->iso_code);
 
@@ -222,6 +228,7 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
 
             $currency = $this->context->currency;
             $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
+            
             $mailVars = array();
             $this->module->validateOrder(
                 $cart->id,
@@ -232,8 +239,9 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
                 $mailVars,
                 (int)$currency->id,
                 false,
-                1
+                $customer->secure_key
             );
+            
 
         } else {
             Context::getContext()->cookie->id_cart = '';
