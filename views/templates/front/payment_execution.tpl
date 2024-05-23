@@ -88,8 +88,8 @@
     {if $city && $city != ''}
         <input type="hidden" name="Localidad" value="{$city}"/>
     {/if}
-    {if $zip && $zip != ''}
-        <input type="hidden" name="CodPostal" value="{$zip}"/>
+    {if $CodPostalEnvio && $CodPostalEnvio != ''}
+        <input type="hidden" name="CodPostalEnvio" value="{$CodPostalEnvio}"/>
     {/if}
     {if $email && $email != ''}
         <input type="hidden" name="Email" value="{$email}"/>

@@ -176,7 +176,7 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
                 'birthday' => $birthday,
                 'address' => $addressText,
                 'city' => $address->city,
-                'zip' => $address->postcode,
+                'CodPostalEnvio' => $address->postcode,
                 'email' => $this->context->customer->email,
                 'phone1' => $address->phone,
                 'phone2' => $address->phone_mobile,
