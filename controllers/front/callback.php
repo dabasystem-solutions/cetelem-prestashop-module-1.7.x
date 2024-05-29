@@ -27,73 +27,45 @@
 class CetelemCallbackModuleFrontController extends ModuleFrontController
 {
 
-    function test(){
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 0);
-        error_reporting(E_ALL);
-        
-        $cart = new Cart(28);
-
-        echo '<pre>'; print_r($cart->id); echo '</pre>';
-        $id_order = Order::getOrderByCartId($cart->id);
-        $order = new Order($id_order);
-        $c_order_state = $order->getCurrentOrderState();
-        echo '<pre>'; print_r($c_order_state);
-        $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-        $moduleName = $this->module->name;
-        $currency = $this->context->currency;
-        $customer = new Customer($cart->id_customer);
-        $mailVars = array();
-
-        $this->module->validateOrder(
-            $cart->id,
-            Configuration::getGlobalValue('PS_OS_CETELEM_PREAPPROVED'),
-            $total,
-            $moduleName,
-            '',
-            $mailVars,
-            (int)$currency->id,
-            false,
-            $customer->secure_key
-        );
-
-
-        die();
-    }
+  
     
     public function initContent()
     {
-        /* global $logFile; */
 
         parent::initContent();
 
-        //? esta funcion la iremos modificando para generar pruebas
-        // $this->test();
 
-        /* $logFile = $_SERVER['DOCUMENT_ROOT'].'/registro.log';
+
+        //$this->writeToLog("initContent\n");
+
+        
+        $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
+    }
+
+    // Función para escribir en el archivo de registro
+    public function writeToLog($logText = null) {
+        global $logFile;
+        $logFile = $_SERVER['DOCUMENT_ROOT'].'/modules/cetelem/registro.log';
         $url = $_SERVER['REQUEST_URI'];
 
         $getParams = $_GET;
         
         $postParams = $_POST;
         
-        $logMessage = "URL: $url\n";
-        $logMessage .= "GET Parameters: " . json_encode($getParams) . "\n";
-        $logMessage .= "POST Parameters: " . json_encode($postParams) . "\n";
-        
-        $this->writeToLog($logMessage); */
+        $message = "\n\n\n-------------------".date("d/M/Y H:i")."--------------------\n\n";
+        $message .= "URL: $url\n";
+        $message .= $logText;
+        $message .= "GET Parameters: " . json_encode($getParams) . "\n";
+        $message .= "POST Parameters: " . json_encode($postParams) . "\n";
 
-        $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
-    }
-
-    // Función para escribir en el archivo de registro
-    public function writeToLog($message) {
-        global $logFile;
         file_put_contents($logFile, $message . PHP_EOL, FILE_APPEND);
     }
 
     public function postProcess()
     {   
+
+       // $this->writeToLog("postProcess\n");
+
 
         $file = _PS_MODULE_DIR_ . 'cetelem/tmp/transaction64e';
         file_put_contents($file, "ring");
@@ -103,7 +75,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             $cetelem_ips = array($cetelem_ips);
         }
         if (!$cetelem_ips) {
-            $cetelem_ips = array('213.170.60.39');
+            $cetelem_ips = array('213.170.60.39','37.29.249.178');
         }
         $matched_ip = false;
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -170,22 +142,17 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
         //Load Cart Id from POST content
         //if the order creation is set, it means they are sending and getting back the order_id instead of cart_id (Albaran)
         if (!Configuration::get('CETELEM_ORDER_CREATION')) {
-            $id_cart = Tools::substr(Tools::getValue('IdTransaccion'), 4);
-            $cart = new Cart((int)$id_cart);
+            if (Tools::getValue('IdTransaccion')) {
+                $id_cart = Tools::substr(Tools::getValue('IdTransaccion'), 4);
+            } else {
+                // Si no viene por GET, verificar si viene por POST
+                $id_cart = Tools::substr(Tools::getValue('IdTransaccion', false, false), 4);
+            }
+          
         } else {
-            //as albaran we send the order id without any random or seconds number, because it will never be able retry the purchase, once the order is created, the cart is empty and can not retry it
-            /* $id_order = Tools::getValue('IdTransaccion');
-              $tmp_order = new Order((int)$id_order);
-              $id_cart = $tmp_order->id_cart;//Tools::substr(Tools::getValue('IdTransaccion'), 4);
-              $cart = new Cart($id_cart); */
-            $id_order = (int)Tools::getValue('IdTransaccion');
+            $id_cart = (int)Tools::substr(Tools::getValue('IdTransaccion', false, false), 4);
 
-            //$tmp_order = new Order((int)$id_order);
-            /* var_dump($id_order);
-              exit; */
-            $id_cart = Order::getCartIdStatic($id_order);
-
-            $cart = new Cart((int)$id_cart);
+            $cart = new Cart($id_cart);
         }
 
         if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
@@ -199,7 +166,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             );
         }
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
-        /*$authorized = false;
+        /*$authorized = false;f
         foreach (Module::getPaymentModules() as $module) {
             if ($module['name'] == 'cetelem') {
                 $authorized = true;
@@ -230,7 +197,13 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             );
         }
 
-        $filename = _PS_MODULE_DIR_ . '/cetelem/tmp/transaction' . Tools::getValue('IdTransaccion');
+        if (Tools::getValue('IdTransaccion')) {
+            $filename = _PS_MODULE_DIR_ . '/cetelem/tmp/transaction' . Tools::getValue('IdTransaccion');
+        } else {
+            // Si no viene por GET, verificar si viene por POST
+            $filename = _PS_MODULE_DIR_ . '/cetelem/tmp/transaction' . Tools::substr(Tools::getValue('IdTransaccion', false, false), 4);
+        }
+
 
         if (file_exists($filename)) {
 
@@ -255,7 +228,6 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
 
                 //$total = (float) $cart->getOrderTotal(true, Cart::BOTH);
                 //$mailVars = array();
-
                 $id_order = Order::getOrderByCartId($cart->id);
                 $order = new Order($id_order);
 
@@ -333,8 +305,10 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         $this->sendStatus( 1, $order->id );
                     }
                 } elseif ($CodResultado == '50') {
+
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                     $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED'));
+                    
 
                     if (!Validate::isLoadedObject($order_state)) {
                         PrestaShopLogger::addLog(
@@ -347,6 +321,9 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         );
                     } else {
                         $current_order_state = $order->getCurrentOrderState();
+
+                    
+
                         if ($current_order_state->id != $order_state->id) {
                             // Create new OrderHistory
                             $history = new OrderHistory();
@@ -373,7 +350,8 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                                 }
                             }
                         }
-                        $this->sendStatus( 1, $order->id );
+                        $this->sendStatus( 1, $order->id );                  
+
                     }
                 } elseif ($CodResultado == '99' || $CodResultado == '51') {
                     $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_DENIED'));
