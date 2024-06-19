@@ -64,7 +64,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
     public function postProcess()
     {   
 
-       // $this->writeToLog("postProcess\n");
+        //$this->writeToLog("postProcess\n");
 
 
         $file = _PS_MODULE_DIR_ . 'cetelem/tmp/transaction64e';
@@ -148,12 +148,11 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 // Si no viene por GET, verificar si viene por POST
                 $id_cart = Tools::substr(Tools::getValue('IdTransaccion', false, false), 4);
             }
-          
         } else {
             $id_cart = (int)Tools::substr(Tools::getValue('IdTransaccion', false, false), 4);
 
-            $cart = new Cart($id_cart);
         }
+        $cart = new Cart($id_cart);
 
         if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
             PrestaShopLogger::addLog(
@@ -568,6 +567,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                             false,
                             $customer->secure_key
                         );
+                        $this->valdiationWithoutURL();
                     }
                 } elseif ($CodResultado == '50') {
                    /*  sleep(7); */

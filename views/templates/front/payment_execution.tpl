@@ -105,10 +105,10 @@
     {/if}
 </form>
 <script type="text/javascript">document.getElementById("cetelem_form").submit();</script>
-/* 
+<!-- /* 
 En teoria lo tenian para cuando el check de crear preorden estaba activo
 {if $albaran || $mode == 'N'}
-{/if} */
+{/if} */ -->
 
 <style type="text/css">
     .sameheight1, .sameheight2 {

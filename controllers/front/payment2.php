@@ -108,8 +108,11 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
         } else {
             $gender = 'SRA';
         }
-        $birthday = date('d/m/Y', strtotime($this->context->customer->birthday));
 
+        if (isset($this->context->customer->birthday) && $this->context->customer->birthday !== '0000-00-00') {
+            $birthday = date('d/m/Y', strtotime($this->context->customer->birthday));
+        }
+        
         //new calculator
 
         $cetelem_module = Module::getInstanceByName('cetelem');
@@ -145,6 +148,8 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
         if (Tools::getValue('encuotas')) {
             $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_NEWCONNECTION : Cetelem::CETELEM_URL_TEST_NEWCONNECTION;
         }
+
+
         $this->context->smarty->assign(
             array(
                 'conex_url' => $conexion,
