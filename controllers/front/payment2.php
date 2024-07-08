@@ -55,11 +55,47 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
      */
     public function initContent()
     {
-        
         parent::initContent();
         // $id_language = Tools::strtoupper($this->context->language->iso_code);
 
         $cart = $this->context->cart;
+
+        $isCetelemMoto = (Configuration::get('CETELEM_MOTO') === '1') ? true : false;
+
+        if ($isCetelemMoto) {     
+            $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_MOTO_CONNECTION : Cetelem::CETELEM_URL_TEST_MOTO_CONNECTION;
+       
+            //? Miramos todos los pedidos en busca de productos moto y los metemos en un nuevo array dentro del producto
+            $products = $cart->getProducts();
+ 
+            $productsWithFeatures = [];
+            // Recorrer los productos y obtener sus características
+            foreach  ($products as $product) {
+                // Obtener las características del producto
+                $features = Product::getFeaturesStatic((int)$product['id_product']);
+                
+                // Inicializar un array para almacenar la información detallada de las características
+                $detailedFeatures = [];
+        
+                // Recorrer las características y obtener información detallada
+                foreach ($features as $feature) {
+                    $featureName = Feature::getFeature((int)$this->context->language->id, (int)$feature['id_feature']);
+                    $featureValue = FeatureValue::getFeatureValueLang((int)$feature['id_feature_value']);
+                    
+                    $detailedFeatures[$featureName['name']] = $featureValue[0]['value'];
+                }
+        
+                // Añadir las características detalladas al producto
+                $product['features'] = $detailedFeatures;
+        
+                // Añadir el producto al array de productos con características
+                $productsWithFeatures[] = $product;
+            }
+
+            $product['features']['isCetelemMoto'] = "true";
+        } else {
+            $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_CONNECTION : Cetelem::CETELEM_URL_TEST_CONNECTION;
+        }
 
         // Codigo para checkear que es el cliente quien valida el pedido
         $securekey = Tools::getValue('securekey');
@@ -125,13 +161,7 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
 
         $cetelem_cart = Context::getContext()->cart;
 
-        //ddd($cetelem_cart);
-
         $total_price = $cetelem_cart->getOrderTotal();
-
-        //ddd($total_price);
-
-        //ddd($total_price);
 
         $this->context->smarty->assign(
             array(
@@ -144,51 +174,50 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
                 'calc_type' => $calc_type
             )
         );
-        $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_CONNECTION : Cetelem::CETELEM_URL_TEST_CONNECTION;
+
         if (Tools::getValue('encuotas')) {
             $conexion = (Configuration::get('CETELEM_ENV')) ? Cetelem::CETELEM_URL_NEWCONNECTION : Cetelem::CETELEM_URL_TEST_NEWCONNECTION;
         }
 
+        $formArray = array(
+            'conex_url' => $conexion,
+            'total' => $cart->getOrderTotal(true, Cart::BOTH),
+            'transact_id' => $transact_id,
+            'center_code' => Configuration::get('CETELEM_CLIENT_ID'),
+            'amount' => $amount,
+            'url' => $this->context->link->getModuleLink('cetelem', 'validation'),
+            'url_ok' => $this->context->link->getModuleLink('cetelem', 'callback'),
+            'timestamp' => $timestamp1,
+            'gender' => $gender,
+            'firstname' => $address->firstname,
+            'lastname' => $address->lastname,
+            'dni' => $address->dni,
+            'birthday' => $birthday,
+            'address' => $addressText,
+            'city' => $address->city,
+            'CodigoPostalEnvio' => $address->postcode,
+            'email' => $this->context->customer->email,
+            'phone1' => $address->phone,
+            'phone2' => $address->phone_mobile,
+            'name_payment' => Configuration::get('CETELEM_LEGAL_NOM_PAGO'),
+            'text_payment' => Configuration::get('CETELEM_LEGAL_CHECKOUT'),
+            'orderConfirmed' => 0,
+            'material' => '499'
+        );
+
+        if ($isCetelemMoto) {
+            //? Si es moto, cambiamos el codigo material, pero también revisamos si es boutique o moto, ya que cambian.
+            /*
+            499 Boutique
+            451 Moto nueva
+            452 Moto segunda mano 
+            */
+            $formArray = array_merge($formArray, $product['features']);
+            $formArray['material'] = (empty($product['features']['bikematerial'])) ? '499' : $product['features']['bikematerial'];
+        }
 
         $this->context->smarty->assign(
-            array(
-                'conex_url' => $conexion,
-                'total' => $cart->getOrderTotal(true, Cart::BOTH),
-                //'mode' => $mode,//Configuration::get('CETELEM_MODALITY'),
-                'transact_id' => $transact_id,
-                'center_code' => Configuration::get('CETELEM_CLIENT_ID'),
-                'amount' => $amount,
-                'url' => $this->context->link->getModuleLink('cetelem', 'validation'),
-                'url_ok' => $this->context->link->getModuleLink('cetelem', 'callback'),
-                'timestamp' => $timestamp1,
-                /*'gender' => $loaded_customer ? CetelemFieldValidator::validateGender($gender) : '',
-                'firstname' => $loaded_address ? CetelemFieldValidator::validateFirstLastName($address->firstname) : '',
-                'lastname' => $loaded_address ? CetelemFieldValidator::validateFirstLastName($address->lastname) : '',
-                'dni' => $loaded_address ? CetelemFieldValidator::validateDNI($address->dni) : '',
-                'birthday' => $loaded_customer ? CetelemFieldValidator::validateBirthday($birthday) : '',
-                'address' => $loaded_address ? CetelemFieldValidator::validateAddress($addressText) : '',
-                'city' => $loaded_address ? CetelemFieldValidator::validateCity($address->city) : '',
-                'zip' => $loaded_address ? CetelemFieldValidator::validatePostcode($address->postcode) : '',
-                'email' => $loaded_address ? CetelemFieldValidator::validateEmail($this->context->customer->email) : '',
-                'phone1' => $loaded_address ? CetelemFieldValidator::validatePhone($address->phone) : '',
-                'phone2' => $loaded_address ? CetelemFieldValidator::validateMobilePhone($address->phone_mobile) : '',*/
-                /*'name_payment' => Configuration::get('CETELEM_CAMPAIGN_NOM_PAGO_' . $id_language),
-                'text_payment' => Configuration::get('CETELEM_CAMPAIGN_TEXTO_PAGO_' . $id_language),*/
-                'gender' => $gender,
-                'firstname' => $address->firstname,
-                'lastname' => $address->lastname,
-                'dni' => $address->dni,
-                'birthday' => $birthday,
-                'address' => $addressText,
-                'city' => $address->city,
-                'CodigoPostalEnvio' => $address->postcode,
-                'email' => $this->context->customer->email,
-                'phone1' => $address->phone,
-                'phone2' => $address->phone_mobile,
-                'name_payment' => Configuration::get('CETELEM_LEGAL_NOM_PAGO'),
-                'text_payment' => Configuration::get('CETELEM_LEGAL_CHECKOUT'),
-                'orderConfirmed' => 0
-            )
+            $formArray
         );
 
         $this->context->smarty->assign(

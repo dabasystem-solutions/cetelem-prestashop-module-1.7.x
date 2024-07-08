@@ -32,19 +32,19 @@ if (!defined('_PS_VERSION_')) {
 
 class Cetelem extends PaymentModule 
 {
-
     protected $output = '';
 
     const CETELEM_URL_TEST_CONNECTION = 'https://test.cetelem.es/eCommerceLite/configuracion.htm';
     const CETELEM_URL_CONNECTION = 'https://www.cetelem.es/eCommerceLite/configuracion.htm';
+    /* MOTO */
+    const CETELEM_URL_TEST_MOTO_CONNECTION = 'https://test.cetelem.es/eCommerceLite/moto/configuracion.htm';
+    const CETELEM_URL_MOTO_CONNECTION = 'https://www.cetelem.es/eCommerceLite/moto/configuracion.htm';
+
     const CETELEM_URL_NEWCONNECTION = 'https://www.cetelem.es/eCommerceLite/enCuotas/configuracion.htm';
     const CETELEM_URL_TEST_NEWCONNECTION = 'https://test.cetelem.es/eCommerceLite/enCuotas/configuracion.htm';
-   
-    
-    
+       
     const CETELEM_URL_SCRIPT = 'https://www.cetelem.es';
     const CETELEM_URL_TEST_SCRIPT = 'https://test.cetelem.es';
-    //const CETELEM_URL_CMS = 'https://www.cetelem.es/contenidos/ecommerce/info.js?partner=';
     const CETELEM_URL_CMS = 'https://www.cetelem.es/contenidos/ecommerce/landing-text.js';
     const CETELEM_URL_CMS_PLAIN = 'https://www.cetelem.es/contenidos/ecommerce/info-plain.js?partner=';
     const URL_CSV_TIN_TAE = 'http://ecreditnow.es/CSV/partners/';
@@ -71,7 +71,6 @@ class Cetelem extends PaymentModule
 
         $this->displayName = $this->l('Cetelem');
         $this->description = $this->l('Customers can pay with a credit.');
-        //include_once _PS_MODULE_DIR_ . 'cetelem/classes/CetelemFieldValidator.php';
         $this->showEnquotas = Configuration::get('CETELEM_SHOWENCUOTAS');
         $this->showCetelem = Configuration::get('CETELEM_SHOWCETELEM');
     }
@@ -82,7 +81,6 @@ class Cetelem extends PaymentModule
 
         Configuration::updateValue('CETELEM_ORDER_CREATION', 0);
         Configuration::updateValue('CETELEM_SPEC_MATERIAL', 0);
-        //Configuration::updateValue('CETELEM_MODALITY', 'G');
         Configuration::updateValue('CETELEM_CLIENT_ID', '');
         Configuration::updateValue('CETELEM_CALC_TYPE', 0);
         Configuration::updateValue('CETELEM_CALC_SHOW', 0);
@@ -96,20 +94,10 @@ class Cetelem extends PaymentModule
         Configuration::updateValue('CETELEM_CALLBACK_IP_RES', 1);
         Configuration::updateValue('CETELEM_SHOWCETELEM', 1);
         Configuration::updateValue('CETELEM_SHOWENCUOTAS', 1);
-        
-
-        //Calculate Yesterday
-        //$calculated_day = strtotime('-1 days');
-        // $yesterday = date('Y-m-d', $calculated_day);
-
-       // Configuration::updateValue('CETELEM_TEXT_COLOR', '#000000');
         Configuration::updateValue('CETELEM_AMOUNT_BLOCK', 0);
         Configuration::updateValue('FONT_SIZE_CETELEM', '12');
-
-       // Configuration::updateValue('CETELEM_BACKGROUND_COLOR', '#ffffff');
-       // Configuration::updateValue('CETELEM_BORDER_COLOR', '#dddddd');
-       // Configuration::updateValue('CETELEM_FEE_COLOR', '#00930f');
         Configuration::updateValue('CETELEM_INFO_CALC_TEXT', '');
+
         return parent::install() &&
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayReassurance') &&
@@ -259,16 +247,13 @@ class Cetelem extends PaymentModule
 
     public function uninstall()
     {
-        //Configuration::deleteByName('CETELEM_MODALITY');
         Configuration::deleteByName('CETELEM_CLIENT_ID');
         Configuration::deleteByName('CETELEM_CALC_TYPE');
         Configuration::deleteByName('CETELEM_CALC_SHOW');
         Configuration::deleteByName('CETELEM_CALC_POSITION');
         Configuration::deleteByName('CETELEM_ENV');
-
         Configuration::deleteByName('CETELEM_ORDER_CREATION');
         Configuration::deleteByName('CETELEM_SPEC_MATERIAL');
-
         Configuration::deleteByName('CETELEM_MIN_AMOUNT');
         Configuration::deleteByName('CETELEM_DISPLAY_CALC');
         Configuration::deleteByName('CETELEM_TEXT_COLOR');
@@ -288,7 +273,6 @@ class Cetelem extends PaymentModule
         if (Tools::isSubmit('submitCetelemConnectData')) {
             $error = '';
 
-            //Configuration::updateValue('CETELEM_MODALITY', Tools::getValue('CETELEM_MODALITY'));
             Configuration::updateValue('CETELEM_CLIENT_ID', Tools::getValue('CETELEM_CLIENT_ID'));
             $url = self::URL_CSV_CALC_LEGAL . Configuration::get('CETELEM_CLIENT_ID');
             $arrContextOptions = array(
@@ -314,12 +298,11 @@ class Cetelem extends PaymentModule
 
             $this->output .= $this->displayConfirmation($this->l('Connection data updated successfully.'));
         } elseif (Tools::isSubmit('submitCetelemSettings')) {
-            $error = '';
+            $error = ''; 
+            Configuration::updateValue('CETELEM_MOTO', Tools::getValue('CETELEM_MOTO'));
             Configuration::updateValue('CETELEM_ENV', Tools::getValue('CETELEM_ENV'));
-
             Configuration::updateValue('CETELEM_ORDER_CREATION', Tools::getValue('CETELEM_ORDER_CREATION'));
             Configuration::updateValue('CETELEM_SPEC_MATERIAL', Tools::getValue('CETELEM_SPEC_MATERIAL'));
-
             Configuration::updateValue('CETELEM_MIN_AMOUNT', Tools::getValue('CETELEM_MIN_AMOUNT'));
             Configuration::updateValue('CETELEM_DISPLAY_CALC', Tools::getValue('CETELEM_DISPLAY_CALC'));
             Configuration::updateValue('CETELEM_TEXT_COLOR', Tools::getValue('CETELEM_TEXT_COLOR'));
@@ -474,7 +457,6 @@ class Cetelem extends PaymentModule
             ),
         );
 
-        //$helper->fields_value['CETELEM_MODALITY'] = Configuration::get('CETELEM_MODALITY');
         $helper->fields_value['CETELEM_CLIENT_ID'] = Configuration::get('CETELEM_CLIENT_ID');
 
         return $helper->generateForm($this->fields_form);
@@ -489,9 +471,7 @@ class Cetelem extends PaymentModule
         }
 
         $calc_types = array(
-            //array('calc' => 1, 'name' => $this->l('Combo Texto')),
             array('calc' => 0, 'name' => $this->l('Combo Columna')),
-            //array('calc' => 2, 'name' => $this->l('Combo Slider')),
         );
         
         $calc_show = array(
@@ -736,13 +716,6 @@ class Cetelem extends PaymentModule
                     ),
                     'class' => 'calc_depending'
                 ),
-                /*array(
-                    'type' => 'color',
-                    'label' => $this->l('Text color'),
-                    'name' => 'CETELEM_TEXT_COLOR',
-                    'required' => false,
-                    'class' => 'calc_depending'
-                ),*/
                 array(
                     'type' => $type,
                     'label' => $this->l('Block amount (only used for slider calc type)'),
@@ -763,27 +736,6 @@ class Cetelem extends PaymentModule
                         )
                     ),
                 ),
-                /*array(
-                    'type' => 'color',
-                    'label' => $this->l('Background color'),
-                    'name' => 'CETELEM_BACKGROUND_COLOR',
-                    'required' => false,
-                    'class' => 'calc_depending'
-                ),
-                array(
-                    'type' => 'color',
-                    'label' => $this->l('Border color'),
-                    'name' => 'CETELEM_BORDER_COLOR',
-                    'required' => false,
-                    'class' => 'calc_depending'
-                ),
-                array(
-                    'type' => 'color',
-                    'label' => $this->l('Fee color'),
-                    'name' => 'CETELEM_FEE_COLOR',
-                    'required' => false,
-                    'class' => 'calc_depending'
-                ),*/
                 array(
                     'type' => 'select',
                     'label' => $this->l('Posición de la calculadora en la página de producto'),
@@ -807,15 +759,274 @@ class Cetelem extends PaymentModule
                     $msg => $this->l('Invalid characters:') . ' <>;=#{}',
                     'class' => 'calc_depending'
                 ),
-               /* array(
+            ),
+            'input' => array(
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Enviorement Real'),
+                    'name' => 'CETELEM_ENV',
+                    $msg => $this->l('Change the enviorment of your module configuration'),
+                    'required' => false,
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Ecredit Moto'),
+                    'name' => 'CETELEM_MOTO',
+                    $msg => $this->l('Add ecredit moto configuration'),
+                    'required' => false,
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Activate Cetelem payment method'),
+                    'name' => 'CETELEM_SHOWCETELEM',
+                    'required' => false,
+                    $msg => $this->l('If we deactivate this option, the Cetelem payment method will not be available.'),
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Activate Encuotas payment method'),
+                    'name' => 'CETELEM_SHOWENCUOTAS',
+                    'required' => false,
+                    $msg => $this->l('If we deactivate this option, the Encuotas payment method will not be available.'),
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Block callback by ip'),
+                    'name' => 'CETELEM_CALLBACK_IP_RES',
+                    'required' => false,
+                    $msg => $this->l('If we activate the option we increase the security in front of external requests that validate orders'),
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
                     'type' => 'text',
-                    'label' => $this->l('Ids Product'),
-                    'name' => 'CETELEM_PRODUCTS',
+                    'label' => $this->l('Cetelem ip'),
+                    'name' => 'CETELEM_IPS',
                     'required' => false,
                     'lang' => false,
-                    
-                    'hint' => $this->l('We indicate separated by comma the ids of the products to which we do not apply the commission'),
-                ),*/
+                    'col' => 6,
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Create order when access to Cetelem Environment'),
+                    'name' => 'CETELEM_ORDER_CREATION',
+                    $msg => $this->l('Create order when access to Cetelem Environment'),
+                    'required' => false,
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Use special material?'),
+                    'name' => 'CETELEM_SPEC_MATERIAL',
+                    'required' => false,
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('No')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Minimum amount'),
+                    'name' => 'CETELEM_MIN_AMOUNT',
+                    'help' => $this->l('Cart minimum amount to display Cetelem payment method in checkout'),
+                    $msg => $this->l(
+                        'IMPORTANT NOTE: if you select an amount with less than 150 €,all orders with less than this amount will be declined '
+                    ),
+                    'required' => false,
+                    'lang' => false,
+                    'suffix' => '€',
+                    'col' => 4,
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Font size'),
+                    'name' => 'FONT_SIZE_CETELEM',
+                    'required' => false,
+                    'lang' => false,
+                    'col' => 1,
+                    'help' => $this->l('Customize the font size of the calculator'),
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Display calculator in product page'),
+                    'name' => 'CETELEM_DISPLAY_CALC',
+                    $msg => $this->l(
+                        'Keep this option enabled to increase the average size of your cart and conversion rates'
+                    ),
+                    'required' => false,
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Enabled')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('Disabled')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Type of calculator to display'),
+                    'name' => 'CETELEM_CALC_TYPE',
+                    'required' => false,
+                    'options' => array(
+                        'query' => $calc_types,
+                        'id' => 'calc',
+                        'name' => 'name',
+                    ),
+                    'class' => 'calc_depending'
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Calculator to display'),
+                    'name' => 'CETELEM_CALC_SHOW',
+                    'required' => false,
+                    'options' => array(
+                        'query' => $calc_show,
+                        'id' => 'calc',
+                        'name' => 'name',
+                    ),
+                    'class' => 'calc_depending'
+                ),
+                array(
+                    'type' => $type,
+                    'label' => $this->l('Block amount (only used for slider calc type)'),
+                    'name' => 'CETELEM_AMOUNT_BLOCK',
+                    'required' => false,
+                    'is_bool' => true,
+                    'class' => 't',
+                    'values' => array(
+                        array(
+                            'id' => 'active_on',
+                            'value' => 1,
+                            'label' => $this->l('Enabled')
+                        ),
+                        array(
+                            'id' => 'active_off',
+                            'value' => 0,
+                            'label' => $this->l('Disabled')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Posición de la calculadora en la página de producto'),
+                    'name' => 'CETELEM_CALC_POSITION',
+                    'required' => false,
+                    'options' => array(
+                        'query' => $calc_position,
+                        'id' => 'calcp',
+                        'name' => 'name',
+                    ),
+                    'class' => 'calc_depending'
+                ),
+                array(
+                    'type' => 'textarea',
+                    'label' => $this->l('Informative text calculator'),
+                    'name' => 'CETELEM_INFO_CALC_TEXT',
+                    'autoload_rte' => true,
+                    'lang' => true,
+                    'cols' => 60,
+                    'rows' => 10,
+                    $msg => $this->l('Invalid characters:') . ' <>;=#{}',
+                    'class' => 'calc_depending'
+                ),
             ),
             'submit' => array(
                 'name' => 'submitCetelemSettings',
@@ -824,12 +1035,11 @@ class Cetelem extends PaymentModule
             ),
         );
 
+        $helper->fields_value['CETELEM_MOTO'] = Configuration::get('CETELEM_MOTO');
         $helper->fields_value['CETELEM_ENV'] = Configuration::get('CETELEM_ENV');
         $helper->fields_value['CETELEM_IPS'] = Configuration::get('CETELEM_IPS');
-
         $helper->fields_value['CETELEM_ORDER_CREATION'] = Configuration::get('CETELEM_ORDER_CREATION');
         $helper->fields_value['CETELEM_SPEC_MATERIAL'] = Configuration::get('CETELEM_SPEC_MATERIAL');
-
         $helper->fields_value['CETELEM_MIN_AMOUNT'] = Configuration::get('CETELEM_MIN_AMOUNT');
         $helper->fields_value['CETELEM_DISPLAY_CALC'] = Configuration::get('CETELEM_DISPLAY_CALC');
         $helper->fields_value['CETELEM_TEXT_COLOR'] = Configuration::get('CETELEM_TEXT_COLOR');
@@ -883,7 +1093,6 @@ class Cetelem extends PaymentModule
                 }
                 if (Tools::getValue('id_product')) {
                     $tmp_product = new Product(Tools::getValue('id_product'));
-                    //$ecotax_rate = (float) Tax::getProductEcotaxRate($this->context->cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
                     $tax_inc = (bool)Configuration::get('PS_TAX');
                     $cetelemPrice = $tmp_product->getPrice($tax_inc, null, 6);
                     $cetelemCombinations = $tmp_product->getWsCombinations();
@@ -943,7 +1152,6 @@ class Cetelem extends PaymentModule
         $calc_show = $cs = (int)Configuration::get('CETELEM_CALC_SHOW');
            
         $calc_type = $this->getCalcTypeScript($ct);
-        //echo $calc_type.'<br/>';
         if(!$this->showCetelem){
             $calc_type = '';
         }
@@ -993,15 +1201,10 @@ class Cetelem extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
-       
-
         $id_language = Tools::strtoupper($this->context->language->iso_code);
-
         $cart = $params['cart'];
-
         $ano = date('Y');
         $ano = Tools::substr($ano, Tools::strlen($ano) - 1, 1);
-
         $ano1 = date('Y');
         $mes1 = 1;
         $dia1 = 1;
@@ -1199,8 +1402,7 @@ class Cetelem extends PaymentModule
         $conex_url = (Configuration::get(
             'CETELEM_ENV'
         )) ? self::CETELEM_URL_CONNECTION : self::CETELEM_URL_TEST_CONNECTION;
-        
-        
+               
         // Redirigimos a payment2 siempre, aun que el check "Create order when access to Cetelem Environment" este activo o no 
         $form_next_url = $this->context->link->getModuleLink(
             $this->name,
@@ -1215,7 +1417,6 @@ class Cetelem extends PaymentModule
         $payment_text = '';
 
         $payment_text = $this->l('Finance with Cetelem');
-        //if ($mode == 'G') {
         $material = '499';
         if($this->hasSpecialProducts()){
             $material = '323';
@@ -1348,116 +1549,6 @@ class Cetelem extends PaymentModule
                     ,
                 ]
             );
-        /*} else {
-          $externalOption->setCallToActionText($payment_text)
-                  ->setAction($form_next_url)
-                  ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logo-checkout.png'))
-                  ->setInputs([
-                      'COMANDO' => [
-                          'name' => 'COMANDO',
-                          'type' => 'hidden',
-                          'value' => 'INICIO',
-                      ]
-                      ,
-                      'Material' => [
-                          'name' => 'Material',
-                          'type' => 'hidden',
-                          'value' => '499',
-                      ]
-                      ,
-                      'CodProducto' => [
-                          'name' => 'CodProducto',
-                          'type' => 'hidden',
-                          'value' => $codproduct,
-                      ]
-                      ,
-                      'IdTransaccion' => [
-                          'name' => 'IdTransaccion',
-                          'type' => 'hidden',
-                          'value' => $fields['transact_id'],
-                      ]
-                      ,
-                      'CodCentro' => [
-                          'name' => 'CodCentro',
-                          'type' => 'hidden',
-                          'value' => Configuration::get('CETELEM_CLIENT_ID'),
-                      ]
-                      ,
-                      'Importe' => [
-                          'name' => 'Importe',
-                          'type' => 'hidden',
-                          'value' => $fields['amount'],
-                      ]
-                      ,
-                      'Modalidad' => [
-                          'name' => 'Modalidad',
-                          'type' => 'hidden',
-                          'value' => $mode,
-                      ]
-                      ,
-                      'ReturnOK' => [
-                          'name' => 'ReturnOK',
-                          'type' => 'hidden',
-                          'value' => $this->context->link->getModuleLink('cetelem', 'callback'),
-                      ]
-                      ,
-                      'ReturnURL' => [
-                          'name' => 'ReturnURL',
-                          'type' => 'hidden',
-                          'value' => $this->context->link->getModuleLink('cetelem', 'validation'),
-                      ]
-                      ,
-                      'Tratamiento' => [
-                          'name' => 'Tratamiento',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_customer'] ? CetelemFieldValidator::validateGender($fields['gender']) : '',
-                      ]
-                      ,
-                      'Nombre' => [
-                          'name' => 'Nombre',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateFirstLastName($fields['address']->firstname) : '',
-                      ]
-                      ,
-                      'Apellidos' => [
-                          'name' => 'Apellidos',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateFirstLastName($fields['address']->lastname) : '',
-                      ]
-                      ,
-                      'FechaNacimiento' => [
-                          'name' => 'FechaNacimiento',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_customer'] ? CetelemFieldValidator::validateBirthday($fields['birthday']) : '',
-                      ]
-                      ,
-                      'Direccion' => [
-                          'name' => 'Direccion',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateAddress($fields['addressText']) : '',
-                      ]
-                      ,
-                      'Localidad' => [
-                          'name' => 'Localidad',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateCity($fields['address']->city) : '',
-                      ]
-                      ,
-                      'CodPostal' => [
-                          'name' => 'CodPostal',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_address'] ? CetelemFieldValidator::validatePostcode($fields['address']->postcode) : '',
-                      ]
-                      ,
-                      'Email' => [
-                          'name' => 'Email',
-                          'type' => 'hidden',
-                          'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateEmail($this->context->customer->email) : '',
-                      ]
-                          ,
-                  ])
-          ;
-        }*/
           
         return $externalOption;
     }
@@ -1487,11 +1578,6 @@ class Cetelem extends PaymentModule
         return $this->display(__FILE__, 'views/templates/hook/confirmation.tpl');
     }
 
-    public function hookDisplayLeftColumnProduct($params)
-    {
-    	
-    }
-
     public function hookDisplayReassurance($params)
     {
         if (!Configuration::get('CETELEM_CALC_POSITION')) {
@@ -1504,14 +1590,12 @@ class Cetelem extends PaymentModule
     public function hookDisplayProductAdditionalInfo($params)
     {
         if (Configuration::get('CETELEM_CALC_POSITION')) {
-            
             return $this->calculatorHookRenderer();
         } else {
             return;
         }
     }
     
-
     public function calculatorHookRenderer()
     {
         if (Configuration::get('CETELEM_DISPLAY_CALC')) {
@@ -1525,7 +1609,6 @@ class Cetelem extends PaymentModule
                 $id_lang = (int)$this->context->language->id;
                 $product = new Product(Tools::getValue('id_product'), false, $id_lang);
             }
-            //$id_language = $this->context->language->iso_code;
 
             //RetroCompatibility with version before 1.6.1.0
             $id_group = (int)Group::getCurrent()->id;
@@ -1701,7 +1784,6 @@ class Cetelem extends PaymentModule
         $reinjectable_quantity = (int)$order_detail->product_quantity - (int)$order_detail->product_quantity_reinjected;
         $quantity_to_reinject = $qty_cancel_product > $reinjectable_quantity ? $reinjectable_quantity : $qty_cancel_product;
         // @since 1.5.0 : Advanced Stock Management
-        //  $product_to_inject = new Product($order_detail->product_id, false, (int) $this->context->language->id, (int) $order_detail->id_shop);
 
         $product = new Product(
             $order_detail->product_id,
@@ -1891,15 +1973,6 @@ class Cetelem extends PaymentModule
         return $this->calculatorHookRenderer();
     }
 
-    /*public function getWidgetVariables($hookName, array $configuration)
-    {
-        if (!$this->active) {
-            return;
-        }
-        $this->smarty->assign($this->getWidgetVariables($hookName, $configuration));
-        return '';
-    }*/
-
     public function hasSpecialMaterial()
     {
         //return true;
@@ -1923,6 +1996,7 @@ class Cetelem extends PaymentModule
             return false;
         }
     }
+    
     public function hasSpecialProducts()
     {
         if (Configuration::get('CETELEM_PRODUCTS')) {

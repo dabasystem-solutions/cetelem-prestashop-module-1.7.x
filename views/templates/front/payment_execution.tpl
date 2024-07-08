@@ -55,7 +55,14 @@
 
 <form action="{$conex_url}" method="post" name="cetelem_form" id="cetelem_form">
     <input type="hidden" name="COMANDO" value="INICIO"/>
-    <input type="hidden" name="Material" value="499"/>
+    <input type="hidden" name="Material" value="{$material}"/>
+
+    {if $isCetelemMoto == 'true' && $bikebrandcode}
+        <input type="hidden" name="bikebrandcode" value="{$bikebrandcode}" />
+        <input type="hidden" name="bikematerial" value="{$bikematerial}" />
+        <input type="hidden" name="registrationdate" value="{$registrationdate}" />
+    {/if}
+
     {*if $mode == 'G'}
         <input type="hidden" name="CodProducto" value="PMG" />
     {else}
@@ -144,7 +151,11 @@ En teoria lo tenian para cuando el check de crear preorden estaba activo
 
     calc_type = '{$calc_type}';//'/eCommerceCalculadora/resources/js/eCalculadoraCetelemCombo.js';
 
-    $(window).load(function () {
-        $('body').append("<script type=\"text\/javascript\" src=\"" + server + calc_type + "\" async><\/script>");
+    window.addEventListener('load', function() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = server + calc_type;
+        script.async = true;
+        document.body.appendChild(script);
     });
 </script>
