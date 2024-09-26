@@ -216,6 +216,10 @@ class CetelemPayment2ModuleFrontController extends ModuleFrontController
             $formArray['material'] = (empty($product['features']['bikematerial'])) ? '499' : $product['features']['bikematerial'];
         }
 
+        //? Print parameters
+        /* echo '<pre>'; print_r($formArray); echo '</pre>';
+        die(); */
+
         $this->context->smarty->assign(
             $formArray
         );
