@@ -62,8 +62,8 @@ class Cetelem extends PaymentModule
     {
         $this->name = 'cetelem';
         $this->tab = 'payments_gateways';
-        $this->version = '17.5.9';
-        $this->author = 'eComm360 SL - www.ecomm360.es';
+        $this->version = '17.6.0';
+        $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
         $this->bootstrap = true;
 

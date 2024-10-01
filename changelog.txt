@@ -1,15 +1,18 @@
 
 Cetelem
-Author: eComm360 S.L.
-Contact: addons@ecomm360.es
+Author: Dabasystem solutions.
+Contact: info@dabasystem.com
 
 -----------------------------------------
 Historic changes for Cetelem
 -----------------------------------------
+
+VERSION 17.6.0
+[-] MO: Cetelem: Major version, motorcycle module unification.
+
 VERSION PROPOSAL
 VERSION 17.5.4
 [-] MO: Cetelem: Important bug fixed. remove code getWidgetVariables.
-
 
 VERSION 17.2.7
 [-] MO: Cetelem: Important bug fixed. In the callback controller it was a cast to integer when we needed to maintain the entire string in the case it starts with 0, due later we will do a substr with 5 positions from the start of the string.

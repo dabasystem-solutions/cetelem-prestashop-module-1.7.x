@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2021 PrestaShop
  *
@@ -26,33 +27,32 @@
 
 class CetelemCallbackModuleFrontController extends ModuleFrontController
 {
-
-  
-    
     public function initContent()
     {
+        if ($_GET['getversion']) {
+            $this->getModuleVersion();
+            die();
+        }
 
         parent::initContent();
 
-
-
         //$this->writeToLog("initContent\n");
 
-        
         $this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
     }
 
     // Función para escribir en el archivo de registro
-    public function writeToLog($logText = null) {
+    public function writeToLog($logText = null)
+    {
         global $logFile;
-        $logFile = $_SERVER['DOCUMENT_ROOT'].'/modules/cetelem/registro.log';
+        $logFile = $_SERVER['DOCUMENT_ROOT'] . '/modules/cetelem/registro.log';
         $url = $_SERVER['REQUEST_URI'];
 
         $getParams = $_GET;
-        
+
         $postParams = $_POST;
-        
-        $message = "\n\n\n-------------------".date("d/M/Y H:i")."--------------------\n\n";
+
+        $message = "\n\n\n-------------------" . date("d/M/Y H:i") . "--------------------\n\n";
         $message .= "URL: $url\n";
         $message .= $logText;
         $message .= "GET Parameters: " . json_encode($getParams) . "\n";
@@ -62,7 +62,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
     }
 
     public function postProcess()
-    {   
+    {
 
         //$this->writeToLog("postProcess\n");
 
@@ -75,7 +75,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             $cetelem_ips = array($cetelem_ips);
         }
         if (!$cetelem_ips) {
-            $cetelem_ips = array('213.170.60.39','37.29.249.178');
+            $cetelem_ips = array('213.170.60.39', '37.29.249.178');
         }
         $matched_ip = false;
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -97,16 +97,16 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             } */
         }
         if (Tools::isSubmit('IdTransaccion') and Tools::isSubmit('codResultado')) {
-            
+
             //Crea log de la trasaccion la cual luego sera verificada.
             $string = Tools::getValue('IdTransaccion') . '|' . Tools::getValue('NSolicitud') . '|' . Tools::getValue(
                 'codResultado'
             );
 
             $file = _PS_MODULE_DIR_ . 'cetelem/tmp/transaction' . Tools::getValue('IdTransaccion');
-            if(is_numeric(Tools::getValue('IdTransaccion')))
-                 file_put_contents($file, $string);
-                 
+            if (is_numeric(Tools::getValue('IdTransaccion')))
+                file_put_contents($file, $string);
+
             if (Configuration::get('CETELEM_ORDER_CREATION')) {
                 $this->valdiationWithoutURL();
             } else {
@@ -150,7 +150,6 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
             }
         } else {
             $id_cart = (int)Tools::substr(Tools::getValue('IdTransaccion', false, false), 4);
-
         }
         $cart = new Cart($id_cart);
 
@@ -257,7 +256,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
 
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                     $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_PREAPPROVED'));
-                    
+
                     if (!Validate::isLoadedObject($order_state)) {
                         PrestaShopLogger::addLog(
                             'Cetelem::CallBack - The new order status is invalid.',
@@ -269,7 +268,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         );
                     } else {
                         $current_order_state = $order->getCurrentOrderState();
-      
+
                         if (Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED') != (int)$current_order_state->id) {
 
                             if ($current_order_state->id != $order_state->id) {
@@ -301,13 +300,13 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                             }
                         }
 
-                        $this->sendStatus( 1, $order->id );
+                        $this->sendStatus(1, $order->id);
                     }
                 } elseif ($CodResultado == '50') {
 
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                     $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED'));
-                    
+
 
                     if (!Validate::isLoadedObject($order_state)) {
                         PrestaShopLogger::addLog(
@@ -321,7 +320,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                     } else {
                         $current_order_state = $order->getCurrentOrderState();
 
-                    
+
 
                         if ($current_order_state->id != $order_state->id) {
                             // Create new OrderHistory
@@ -349,8 +348,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                                 }
                             }
                         }
-                        $this->sendStatus( 1, $order->id );                  
-
+                        $this->sendStatus(1, $order->id);
                     }
                 } elseif ($CodResultado == '99' || $CodResultado == '51') {
                     $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_DENIED'));
@@ -364,7 +362,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                             (int)$cart->id,
                             true
                         );
-                    } else if($order->module=="cetelem") {
+                    } else if ($order->module == "cetelem") {
                         $current_order_state = $order->getCurrentOrderState();
                         if ($current_order_state->id != $order_state->id) {
                             // Create new OrderHistory
@@ -404,8 +402,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                             }
                         }
                     }
-                    $this->sendStatus( 7, null );
-
+                    $this->sendStatus(7, null);
                 } else {
                     //! el default aprueba el pedido??? revisar, no deberia
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
@@ -481,7 +478,7 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                 true
             );
         }
-        
+
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
         /*$authorized = false;
         foreach (Module::getPaymentModules() as $module) {
@@ -538,24 +535,24 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
 
                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
                 $mailVars = array();
-                
+
                 /* if ($CodResultado == '00') {
 				        		sleep(2);
 				        } */
 
                 $id_order = Order::getOrderByCartId($cart->id);
-							 if($id_order)
-					        	return;
+                if ($id_order)
+                    return;
                 $order = new Order($id_order);
                 $c_order_state = $order->getCurrentOrderState();
                 $moduleName = $this->module->name;
-                if(Tools::getValue('encuotas')){
+                if (Tools::getValue('encuotas')) {
                     $moduleName = 'encuotas';
                 }
                 if ($CodResultado == '00') {
-                   
+
                     if (Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED') != (int)$c_order_state->id) {
-                         PrestaShopLogger::addLog('Validamos pedido Cetelem 00', 1, null, 'Cart', (int) $cart->id, true); 
+                        PrestaShopLogger::addLog('Validamos pedido Cetelem 00', 1, null, 'Cart', (int) $cart->id, true);
                         $this->module->validateOrder(
                             $cart->id,
                             Configuration::getGlobalValue('PS_OS_CETELEM_PREAPPROVED'),
@@ -570,11 +567,11 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         $this->valdiationWithoutURL();
                     }
                 } elseif ($CodResultado == '50') {
-                   /*  sleep(7); */
+                    /*  sleep(7); */
 
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
-                     PrestaShopLogger::addLog('Validamos pedido Cetelem 50', 1, null, 'Cart', (int) $cart->id, true);
-               
+                    PrestaShopLogger::addLog('Validamos pedido Cetelem 50', 1, null, 'Cart', (int) $cart->id, true);
+
                     $this->module->validateOrder(
                         $cart->id,
                         Configuration::getGlobalValue('PS_OS_CETELEM_APPROVED'),
@@ -587,8 +584,8 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         $customer->secure_key
                     );
                 } elseif ($CodResultado == '99' || $CodResultado == '51') {
-                   // $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_DENIED'));
-                     PrestaShopLogger::addLog('Validamos pedido Cetelem 99 - 51', 1, null, 'Cart', (int) $cart->id, true);
+                    // $order_state = new OrderState(Configuration::getGlobalValue('PS_OS_CETELEM_DENIED'));
+                    PrestaShopLogger::addLog('Validamos pedido Cetelem 99 - 51', 1, null, 'Cart', (int) $cart->id, true);
                     $this->module->validateOrder(
                         $cart->id,
                         Configuration::getGlobalValue('PS_OS_CETELEM_DENIED'),
@@ -600,7 +597,6 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
                         false,
                         $customer->secure_key
                     );
-
                 } else {
                     /* Change order status, add a new entry in order history and send an e-mail to the customer if needed */
                     PrestaShopLogger::addLog('Validamos pedido Cetelem ELSE', 1, null, 'Cart', (int) $cart->id, true);
@@ -653,5 +649,43 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
         header('Content-Type: application/json');
         echo $json;
         exit;
+    }
+
+    private function getModuleVersion()
+    {
+        $module = Module::getInstanceByName('cetelem');
+        $version = $module->version;
+        $autor = $module->author;
+
+        if (Tools::getValue('getversion')) {
+            $module = Module::getInstanceByName('cetelem');
+            $version = $module->version;
+            $autor = $module->author;
+
+            echo '
+            <style>
+                .module-info {
+                    background-color: #f8f9fa;
+                    border: 1px solid #dee2e6;
+                    border-radius: 5px;
+                    padding: 10px;
+                    margin: 20px 0;
+                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+                }
+                .module-info h2 {
+                    color: #3a913f;
+                }
+                .module-info p {
+                    font-size: 14px;
+                    color: #343a40;
+                }
+            </style>
+            
+            <div class="module-info">
+                <h2>Módule information</h2>
+                <p><strong>Version:</strong> ' . htmlspecialchars($version) . '</p>
+                <p><strong>Author:</strong> ' . htmlspecialchars($autor) . '</p>
+            </div>';
+        }
     }
 }
