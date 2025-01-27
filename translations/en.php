@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{cetelem}prestashop>cetelem_34c27a50c96758224ec74fe47714a8af'] = 'Cetelem';
 $_MODULE['<{cetelem}prestashop>cetelem_ccb9dd9281963723f8bd4b0a216258ef'] = 'Your customers will pay performing a funding request.';
 $_MODULE['<{cetelem}prestashop>cetelem_eed4aeb72f8169328c9b584ebb9e5024'] = 'Connection data updated successfully.';
