@@ -295,8 +295,8 @@ class CetelemCallbackModuleFrontController extends ModuleFrontController
     {
         $data = [
             'statusCode' => $statusCode,
-            'statusText' => $statusCode == 1 ? "OK" : "ERROR",
-            'orderId' => $statusCode == 1 ? $orderID : null,
+            'statusText' => $statusCode != 7 ? "OK" : "ERROR",
+            'orderId' => $statusCode != 7 ? $orderID : null,
             'errorData' => $statusCode == 7 ? "Error processing transaction" : null,
         ];
 
