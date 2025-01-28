@@ -63,7 +63,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.6.1';
+        $this->version = '17.6.2';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => '8.0.0'];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
