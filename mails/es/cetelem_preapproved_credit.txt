@@ -1,0 +1,6 @@
+Hola {firstname} {lastname},
+
+Su credito ha sido PRE-AUTORIZADO.
+Le informaremos cuando este mismo sea aprobado.
+
+{shop_name}

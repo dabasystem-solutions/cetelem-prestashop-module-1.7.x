@@ -1,0 +1,29 @@
+
+BLOCKED ATTACHED FILE ALERT
+
+The Mail Protection System has blocked a file due to the 'IPS Extensions Blocked ' rule.
+
+Context: 'calc.js'
+Disallowed due to filename
+Ticket Number: '0c64-5e4c-12ed-0001'
+
+Please contact your local support if ou need help regarding this notification
+
+================================================================================
+
+ALERTE DE FICHIER BLOQUE
+
+Le Système de Protection de Messagerie a bloqué un fichier à cause de la règle 'IPS Extensions Blocked '.
+
+Fichier concerné: 'calc.js'
+Rejetté à cause de filename
+Numéro de ticket: '0c64-5e4c-12ed-0001'
+
+Veuillez contacter votre support local pour toute aide concernant cette notification
+
+
+
+For further information, contact your system administrator. 
+Copyright 1999-2014 McAfee, Inc.
+All Rights Reserved.
+http://www.mcafee.com

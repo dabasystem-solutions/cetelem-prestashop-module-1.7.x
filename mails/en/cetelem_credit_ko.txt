@@ -1,0 +1,6 @@
+Hello {firstname} {lastname},
+
+Your credit has been DENIED.
+You can place your order again with another method of payment available in our store.
+
+{shop_name}

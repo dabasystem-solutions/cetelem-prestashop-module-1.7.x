@@ -1,0 +1,6 @@
+Hello {firstname} {lastname},
+
+Your credit has been APPROVED.
+Soon we will inform you about your order.
+
+{shop_name}
