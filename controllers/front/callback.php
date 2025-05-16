@@ -309,7 +309,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
 
     private function getModuleVersion()
     {
-        $module = Module::getInstanceByName('cetelem');
+        $module = Module::getInstanceByName('cetelempayment');
         $version = $module->version;
         $autor = $module->author;
 

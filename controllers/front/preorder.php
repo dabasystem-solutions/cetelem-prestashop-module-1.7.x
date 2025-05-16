@@ -35,7 +35,7 @@ class CetelemPreorderModuleFrontController extends ModuleFrontController
     {
         parent::__construct();
 
-        require_once _PS_MODULE_DIR_ . 'cetelem/classes/CetelemStates.php';
+        require_once _PS_MODULE_DIR_ . 'cetelempayment/classes/CetelemStates.php';
         $this->cetelemStates = new CetelemStates();
     }
 
@@ -51,7 +51,7 @@ class CetelemPreorderModuleFrontController extends ModuleFrontController
             // his address just before the end of the checkout process
             $authorized = false;
             foreach (Module::getPaymentModules() as $module) {
-                if ($module['name'] == 'cetelem') {
+                if ($module['name'] == 'cetelempayment') {
                     $authorized = true;
                     break;
                 }

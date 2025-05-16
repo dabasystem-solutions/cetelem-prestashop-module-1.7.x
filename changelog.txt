@@ -7,6 +7,10 @@ Contact: info@dabasystem.com
 Historic changes for Cetelem
 -----------------------------------------
 
+
+VERSION 17.6.3
+[-] MO: Corrección de errores.
+
 VERSION 17.6.0
 [-] MO: Cetelem: Major version, motorcycle module unification.
 

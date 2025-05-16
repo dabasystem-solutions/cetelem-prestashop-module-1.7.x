@@ -37,7 +37,7 @@ class CetelemRedirectModuleFrontController extends ModuleFrontController
     {
         parent::__construct();
 
-        require_once _PS_MODULE_DIR_ . 'cetelem/classes/CetelemStates.php';
+        require_once _PS_MODULE_DIR_ . 'cetelempayment/classes/CetelemStates.php';
         $this->cetelemStates = new CetelemStates();
     }
     public function postProcess()
@@ -78,7 +78,7 @@ class CetelemRedirectModuleFrontController extends ModuleFrontController
                         'phone2' => Tools::getValue('phone2'),
                     )
                 );
-                return $this->setTemplate('module:cetelem/views/templates/front/payment_execution.tpl');
+                return $this->setTemplate('module:cetelempayment/views/templates/front/payment_execution.tpl');
             } else {
                 $this->context->smarty->assign(
                     array(
@@ -104,7 +104,7 @@ class CetelemRedirectModuleFrontController extends ModuleFrontController
                         'phone2' => Tools::getValue('phone2'),
                     )
                 );
-                return $this->setTemplate('module:cetelem/views/templates/front/payment_execution.tpl');
+                return $this->setTemplate('module:cetelempayment/views/templates/front/payment_execution.tpl');
             }
             //Tools::getValue($key);
         }
@@ -115,7 +115,7 @@ class CetelemRedirectModuleFrontController extends ModuleFrontController
         $this->display_column_left = false;
         $this->display_column_right = false;
         parent::initContent();
-        return $this->setTemplate('module:cetelem/views/templates/front/redirect.tpl');
+        return $this->setTemplate('module:cetelempayment/views/templates/front/redirect.tpl');
     }
 
     protected function displayError($message, $description = false)
@@ -137,7 +137,7 @@ class CetelemRedirectModuleFrontController extends ModuleFrontController
          */
         array_push($this->errors, $this->module->l($message), $description);
 
-        return $this->setTemplate('module:cetelem/views/templates/front/error.tpl');
+        return $this->setTemplate('module:cetelempayment/views/templates/front/error.tpl');
     }
 
     protected function orderCreation()
@@ -149,7 +149,7 @@ class CetelemRedirectModuleFrontController extends ModuleFrontController
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
         $authorized = false;
         foreach (Module::getPaymentModules() as $module) {
-            if ($module['name'] == 'cetelem') {
+            if ($module['name'] == 'cetelempayment') {
                 $authorized = true;
                 break;
             }

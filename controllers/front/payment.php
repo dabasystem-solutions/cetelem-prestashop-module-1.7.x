@@ -41,7 +41,7 @@ class CetelemPaymentModuleFrontController extends ModuleFrontController
     {
         parent::__construct();
 
-        require_once _PS_MODULE_DIR_ . 'cetelem/classes/CetelemStates.php';
+        require_once _PS_MODULE_DIR_ . 'cetelempayment/classes/CetelemStates.php';
         $this->cetelemStates = new CetelemStates();
     }
 
@@ -165,7 +165,7 @@ class CetelemPaymentModuleFrontController extends ModuleFrontController
         if ($new_order) {
             $albaran = Order::getOrderByCartId((int)$cart->id);
             $this->context->smarty->assign(array('albaran' => $albaran ? $albaran : 0));
-            return $this->setTemplate('module:cetelem/views/templates/front/payment_execution.tpl');
+            return $this->setTemplate('module:cetelempayment/views/templates/front/payment_execution.tpl');
         } else {
             return $this->displayError('An error occurred while trying to create an order');
         }
@@ -181,7 +181,7 @@ class CetelemPaymentModuleFrontController extends ModuleFrontController
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
         $authorized = false;
         foreach (Module::getPaymentModules() as $module) {
-            if ($module['name'] == 'cetelem') {
+            if ($module['name'] == 'cetelempayment') {
                 $authorized = true;
                 break;
             }
@@ -230,6 +230,6 @@ class CetelemPaymentModuleFrontController extends ModuleFrontController
          */
         array_push($this->errors, $this->module->l($message), $description);
 
-        return $this->setTemplate('module:cetelem/views/templates/front/error.tpl');
+        return $this->setTemplate('module:cetelempayment/views/templates/front/error.tpl');
     }
 }

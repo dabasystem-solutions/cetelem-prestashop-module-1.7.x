@@ -58,9 +58,10 @@ class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
         }
 
         // Generación del ID de transacción
-        $transact_id = date('Y') . str_pad(date('z') + 1, 3, '0', STR_PAD_LEFT) . str_pad($cart->id, 6, '0', STR_PAD_LEFT);
+       $transact_id = date('Y') . str_pad(date('z') + 1, 3, '0', STR_PAD_LEFT) . str_pad($cart->id, 6, '0', STR_PAD_LEFT);
+$transact_id = substr($transact_id, 0, 13);
         $this->context->cookie->__set('cetelem_transact_id', $transact_id);
-
+        
         $amount = str_replace('.', '', number_format($cart->getOrderTotal(true, 3), 2, '.', ''));
         $address = new Address($cart->id_address_invoice);
         $customer = new Customer($cart->id_customer);
@@ -136,8 +137,8 @@ class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
             'transact_id' => $transact_id,
             'center_code' => Configuration::get('CETELEM_CLIENT_ID') ?? '',
             'amount' => $amount,
-            'url' => $this->context->link->getModuleLink('cetelem', 'validation'),
-            'url_ok' => $this->context->link->getModuleLink('cetelem', 'callback'),
+            'url' => $this->context->link->getModuleLink('cetelempayment', 'validation'),
+            'url_ok' => $this->context->link->getModuleLink('cetelempayment', 'callback'),
             'timestamp' => time(),
             'gender' => $gender,
             'firstname' => $address->firstname ?? '',
@@ -148,8 +149,8 @@ class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
             'city' => $address->city ?? '',
             'CodigoPostalEnvio' => $address->postcode ?? '',
             'email' => $customer->email ?? '',
-            'phone1' => $address->phone ?? '',
-            'phone2' => $address->phone_mobile ?? '',
+            'phone1' => $address->phone_mobile ?? '',
+            'phone2' => $address->phone ?? '',
             'name_payment' => Configuration::get('CETELEM_LEGAL_NOM_PAGO') ?? '',
             'text_payment' => Configuration::get('CETELEM_LEGAL_CHECKOUT') ?? '',
             'orderConfirmed' => 0,
@@ -173,7 +174,7 @@ class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
 
             $authorized = false;
             foreach (Module::getPaymentModules() as $module) {
-                if ($module['name'] == 'cetelem') {
+                if ($module['name'] == 'cetelempayment') {
                     $authorized = true;
                     break;
                 }
@@ -205,4 +206,5 @@ class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
 
         return $this->setTemplate('module:cetelempayment/views/templates/front/payment_execution.tpl');
     }
+   
 }

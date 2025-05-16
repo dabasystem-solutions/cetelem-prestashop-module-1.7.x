@@ -39,7 +39,7 @@ class CetelemValidationModuleFrontController extends ModuleFrontController
 
         $authorized = false;
         foreach (Module::getPaymentModules() as $module) {
-            if ($module['name'] == 'cetelem') {
+            if ($module['name'] == 'cetelempayment') {
                 $authorized = true;
                 break;
             }
@@ -73,7 +73,7 @@ class CetelemValidationModuleFrontController extends ModuleFrontController
                 );
             } elseif ($CodResultado == '99' || $CodResultado == '51') {
                 $this->display_column_left = false;
-                $this->setTemplate('module:cetelem/views/templates/front/denied.tpl');
+                $this->setTemplate('module:cetelempayment/views/templates/front/denied.tpl');
             } else {
                 Tools::redirect(
                     'index.php?controller=order-confirmation&id_cart=' . $cart->id . '&id_module=' . $this->module->id . '&id_order=' . $this->module->currentOrder . '&no_order_state=1&key=' . $customer->secure_key

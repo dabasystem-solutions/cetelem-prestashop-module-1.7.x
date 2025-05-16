@@ -63,7 +63,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.6.2';
+        $this->version = '17.6.3';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => '8.2.0'];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
@@ -1160,7 +1160,7 @@ class CetelemPayment extends PaymentModule
         $dias_diferencia = abs($dias_diferencia);
         $day_julian = floor($dias_diferencia) + 1;
 
-        $transact_id = $ano . str_pad($day_julian, 3, '0', STR_PAD_LEFT) . str_pad($cart->id, 9, '0', STR_PAD_LEFT);
+        $transact_id = $ano . str_pad($day_julian, 3, '0', STR_PAD_LEFT) . str_pad($cart->id, 8, '0', STR_PAD_LEFT);
         $this->context->cookie->__set('cetelem_transact_id', $transact_id);
         $amount = str_replace('.', '', number_format($cart->getOrderTotal(true, 3), 2, '.', ''));
 
@@ -1449,7 +1449,7 @@ class CetelemPayment extends PaymentModule
                         //'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateFirstLastName($fields['address']->lastname) : '',
                         'value' => $fields['address']->lastname ? $fields['address']->lastname : '',
                     ],
-                    'FechaNacimiento' => [
+                     'FechaNacimiento' => [
                         'name' => 'FechaNacimiento',
                         'type' => 'hidden',
                         //'value' => $fields['loaded_customer'] ? CetelemFieldValidator::validateBirthday($fields['birthday']) : '',

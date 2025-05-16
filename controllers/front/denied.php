@@ -40,7 +40,7 @@ class CetelemDeniedModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-        //$this->setTemplate('module:cetelem/views/templates/front/callback.tpl');
+        //$this->setTemplate('module:cetelempayment/views/templates/front/callback.tpl');
         return $this->setTemplate('denied.tpl');
     }
 }
