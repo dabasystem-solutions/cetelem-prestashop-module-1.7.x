@@ -57,7 +57,7 @@ $_MODULE['<{cetelempayment}prestashop>cetelempayment_fc1ecd518e042d94a840a11d6e2
 $_MODULE['<{cetelempayment}prestashop>cetelempayment_411bbf81e39b9b55225f381871774e37'] = 'Seleccione el punto de recogida';
 $_MODULE['<{cetelempayment}prestashop>cetelempayment_7aafc3744b58ea0f9ed5847d5dc4d443'] = 'Selecciona los transportistas que serán los puntos de recogida.';
 $_MODULE['<{cetelempayment}prestashop>cetelempayment_32ef4ab255324b4bbef4aa18235f80a9'] = 'Paga enCuotas: financiación inmediata	';
-$_MODULE['<{cetelempayment}prestashop>cetelempayment_e5a838c0549d64f11557d5ee1d27c6d6'] = 'Financiar con Cetlem';
+$_MODULE['<{cetelempayment}prestashop>cetelempayment_e5a838c0549d64f11557d5ee1d27c6d6'] = 'Financiar con Cetelem';
 $_MODULE['<{cetelempayment}prestashop>calculator_917709346cd3cefd00e463f65f1a55d8'] = 'Financiación';
 $_MODULE['<{cetelempayment}prestashop>calculator_f59327ba2fc001d3f71ff5f656662ccd'] = 'Calcula tu cuota mensual';
 $_MODULE['<{cetelempayment}prestashop>calculator_4f36f7e1d328497e6bbe23f4b8b2385b'] = '¿Cuánto financiarías?';

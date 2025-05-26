@@ -149,11 +149,12 @@ class CetelemStates
         string $icon_name,
         bool $logable_false = false
     ) {
+        $invoice = ($config_variable === 'PS_OS_CETELEM_APPROVED') ? 1 : 0;
         // Create orders
         $OrderState = new OrderState();
         $OrderState->name = $name_translations;
         $OrderState->send_email = false;
-        $OrderState->invoice = 0;
+        $OrderState->invoice = $invoice;
         $OrderState->logable = $logable_false;
         $OrderState->color = $state_color;
         $OrderState->module_name = $this->name;

@@ -194,8 +194,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
 
         $currency = $this->context->currency;
         $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-        $moduleName = Tools::getValue('encuotas') ? 'encuotas' : $this->module->name;
-
+        $moduleName = Tools::getValue('encuotas') ? 'encuotas' : $this->l('Financiación con Cetelem', 'cetelempayment');;
         $orderState = $this->getOrderStateForResultCode($codResultado);
 
         try {

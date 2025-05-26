@@ -7,6 +7,8 @@ Contact: info@dabasystem.com
 Historic changes for Cetelem
 -----------------------------------------
 
+VERSION 17.6.4
+[-] MO: Corrección de errores, sistema de registro de transacciones y traducción de cadenas.
 
 VERSION 17.6.3
 [-] MO: Corrección de errores.

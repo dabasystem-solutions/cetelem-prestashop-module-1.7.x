@@ -63,7 +63,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.6.3';
+        $this->version = '17.6.4';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => '8.2.0'];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
@@ -1676,7 +1676,7 @@ class CetelemPayment extends PaymentModule
     {
         $tmp_order = new Order((int)$params['id_order']);
         $tmp_payment = $tmp_order->payment;
-        if ($tmp_payment == 'cetelem' && (int)$tmp_order->current_state == (int)Configuration::get('PS_OS_CANCELED')) {
+        if ($tmp_payment == 'cetelempayment' && (int)$tmp_order->current_state == (int)Configuration::get('PS_OS_CANCELED')) {
             Tools::redirectAdmin($_SERVER['HTTP_REFERER']);
             exit;
         }
