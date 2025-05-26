@@ -1,0 +1,5 @@
+
+
+- Configuration::get('CETELEM_ORDER_CREATION'): segun la seleccion de la opcion
+"Create order when access to Cetelem Environment" desde el admin, devolverá true o false
+con el check activo devuelve true

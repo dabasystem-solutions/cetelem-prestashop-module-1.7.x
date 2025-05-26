@@ -1,0 +1,6 @@
+Hola {firstname} {lastname},
+
+Su credito ha sido DENEGADO.
+Puede realizar su pedido de nuevo con otra forma de pago disponible en nuestra tienda.
+
+{shop_name}
