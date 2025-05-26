@@ -29,12 +29,12 @@
 
         <div class="row">
             <div class="panel panel-success">
-                <h3 class="panel-heading"><i class="icon icon-credit-card"></i> {l s='Cetelem' mod='cetelem'}</h3>
+                <h3 class="panel-heading"><i class="icon icon-credit-card"></i> {l s='Cetelem' mod='cetelempayment'}</h3>
             </div>
             <div class="col-xs-6 col-md-4">
-                <p><strong>{l s='Now your customers can buy and with a credit!' mod='cetelem'}</strong></p>
+                <p><strong>{l s='Now your customers can buy and with a credit!' mod='cetelempayment'}</strong></p>
                 <p>
-                    {l s='Please fill the information below' mod='cetelem'}
+                    {l s='Please fill the information below' mod='cetelempayment'}
                 </p>
             </div>
             <div class="col-xs-12 col-md-4 pull-right text-right">

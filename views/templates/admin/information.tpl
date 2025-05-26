@@ -25,23 +25,32 @@
 
 <div id="module-content" class="clearfix">
     <div class="tab-content col-lg-12">
-        <div class="panel" style="overflow:hidden">
-            <div class="panel-heading">
-                <i class="icon icon-credit-card"></i> {l s='Cetelem' mod='cetelem'}
-            </div>
-            <div class="col-xs-6 col-md-4">
-                <p><strong>{l s='Now your customers can buy and with a credit!' mod='cetelem'}</strong></p><br/>
-                <p>
-                    {l s='Please fill the information below' mod='cetelem'}
-                </p>
+        <div class="panel panel-default shadow-sm rounded p-4 mb-4">
+            <div class="panel-heading d-flex justify-content-between align-items-center mb-3"
+                style="border-bottom: 1px solid #ddd;">
+
+                <img src="{$module_dir|escape:'html':'UTF-8'}views/img/logo-229x130.png" alt="Cetelem Logo"
+                    class="img-fluid" style="max-height: 80px;">
             </div>
 
-            <div class="col-xs-12 col-md-4 pull-right text-right">
-                <img src="{$module_dir|escape:'html':'UTF-8'}views/img/logo-229x130.png"
-                     class="col-xs-6 col-md-4 pull-right" id="payment-logo"/>
+            <div class="row">
+                <div class="col-md-8">
+                    <p class="lead mb-2">
+                        <h2>{l s='Now your customers can buy and pay with a credit!' mod='cetelempayment'}</h2>
+                    </p>
+                    <p class="text-muted">
+                        <h4>{l s='Please fill the information below' mod='cetelempayment'}</h4>
+                    </p>
+                     
+                </div>
+                <div class="col-md-4">
+                <img src="{$module_dir|escape:'html':'UTF-8'}views/img/imagen_cetelem.png" alt="Cetelem Logo"
+                    class="img-fluid" style="max-height: 150px;">
+                </div>
             </div>
         </div>
+
         {$connection_data}
         {$config_data}
-          </div>
-</div>        
+    </div>
+</div>
