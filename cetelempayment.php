@@ -99,8 +99,8 @@ class CetelemPayment extends PaymentModule
         Configuration::updateValue('CETELEM_LEGAL_CHECKOUT', '');
         Configuration::updateValue('CETELEM_IPS', '213.170.60.39');
         Configuration::updateValue('CETELEM_CALLBACK_IP_RES', 1);
-        Configuration::updateValue('CETELEM_SHOWCETELEM', 1);
-        Configuration::updateValue('CETELEM_SHOWENCUOTAS', 1);
+        Configuration::updateValue('CETELEM_SHOWCETELEM', 0);
+        Configuration::updateValue('CETELEM_SHOWENCUOTAS', 0);
         Configuration::updateValue('CETELEM_AMOUNT_BLOCK', 0);
         Configuration::updateValue('FONT_SIZE_CETELEM', '12');
         Configuration::updateValue('CETELEM_INFO_CALC_TEXT', '');
