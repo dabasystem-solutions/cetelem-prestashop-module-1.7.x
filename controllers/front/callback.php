@@ -37,7 +37,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
     private const RESULT_CODE_DENIED_2 = '51';
 
 
-    private const LOG_FILE_PATH = _PS_MODULE_DIR_ . 'cetelempayment/registro.log';
+    private const LOG_FILE_PATH = _PS_MODULE_DIR_ . 'cetelempayment/tmp/registro.log';
 
 
     private $cetelemStates;
@@ -97,15 +97,33 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         }
     }
 
-    private function isTransactionDuplicate($idTransaccion, $Codigo, $idCart)
-    {
-        $query = new DbQuery();
-        $query->select('COUNT(*)');
-        $query->from('cetelem_transactions');
-        $query->where('transaction_id = "' . pSQL($idTransaccion) . '" AND result_code "' . pSQL($Codigo) . '" AND id_cart "' . pSQL($idCart) . '"');
-
-        return (bool)Db::getInstance()->getValue($query);
+private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
+{
+    if (empty($idTransaccion) || empty($codigo) || empty($idCart)) {
+        $this->writeToLog("isTransactionDuplicate: parámetros inválidos o vacíos");
+        return true;
     }
+
+    $query = new DbQuery();
+    $query->select('COUNT(*)')
+        ->from('cetelem_transactions')
+        ->where('transaction_id = "' . pSQL($idTransaccion) . '"')
+        ->where('result_code = "' . pSQL($codigo) . '"')
+        ->where('id_cart = ' . (int)$idCart);
+
+    try {
+        $count = (int) Db::getInstance()->getValue($query);
+        if ($count > 0) {
+            $this->writeToLog("isTransactionDuplicate: Transacción duplicada detectada para ID: $idTransaccion");
+            return true;
+        }
+        return false;
+    } catch (Exception $e) {
+        $this->writeToLog("isTransactionDuplicate: Error al consultar la base de datos - " . $e->getMessage());
+        return true;
+    }
+}
+
     private function getIdCart($idTransaccion)
     {
         $query = new DbQuery();
@@ -141,7 +159,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
 
         if ($this->isTransactionDuplicate($idTransaccion, $codResultado, $id_cart)) {
             $this->writeToLog("Duplicate transaction detected: $idTransaccion");
-            $this->sendStatus(1, $existing_order);
+            $this->sendStatus(7, $existing_order);
             return;
         }
 
@@ -256,13 +274,13 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
                 case self::RESULT_CODE_PRE_APPROVED:
 
                     $this->updateOrderState($order, $this->cetelemStates->StateCetelemPreApproved());
-                    $this->sendStatus(2, $order->id);
+                    $this->sendStatus(1, $order->id);
                     break;
 
                 case self::RESULT_CODE_DENIED_1:
                 case self::RESULT_CODE_DENIED_2:
                     $this->updateOrderState($order, $this->cetelemStates->StateCetelemDenied());
-                    $this->sendStatus(7, null);
+                    $this->sendStatus(1, null);
                     break;
             }
         }
