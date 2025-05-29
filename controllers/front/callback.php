@@ -159,6 +159,14 @@ private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
 
         if ($this->isTransactionDuplicate($idTransaccion, $codResultado, $id_cart)) {
             $this->writeToLog("Duplicate transaction detected: $idTransaccion");
+            PrestaShopLogger::addLog(
+                'Duplicate transaction detected',
+                3,
+                null,
+                'Transaction',
+                null,
+                true
+            );
             $this->sendStatus(7, $existing_order);
             return;
         }
