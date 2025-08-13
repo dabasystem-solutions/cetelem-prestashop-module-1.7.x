@@ -121,6 +121,21 @@
             </div>
         </div>
 
+        <div class="card mb-3">
+            <div class="card-header bg-white" id="headingThree">
+                <button class="btn btn-link w-100 text-left collapsed" type="button" data-toggle="collapse"
+                        data-target="#faq5" aria-expanded="false" aria-controls="faq4"
+                        style="font-weight: 500; color: #007bff;">
+                    {l s='the calculator is not showing on the product page?' mod='cetelempayment'}
+                </button>
+            </div>
+            <div id="faq5" class="collapse" aria-labelledby="headingThree" data-parent="#faqAccordion">
+                <div class="card-body">
+                   {l s="If the calculator is not displayed on the product page, make sure your theme has the hooks or has the module inserted in the hooks: DisplayReassurance or ProductAdditionalInfo, otherwise you can add a custom hook in your theme: {'{hook h=\'displayCalculadoraCetelem\'}'}" mod='cetelempayment'}
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

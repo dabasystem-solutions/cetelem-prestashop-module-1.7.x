@@ -69,6 +69,17 @@ class CetelemPaymentValidationModuleFrontController extends ModuleFrontControlle
             }
 
             if ($CodResultado == '00' || $CodResultado == '50') {
+                $this->module->validateOrder(
+                    (int)$cart->id,
+                    Configuration::get('PS_OS_PAYMENT'),
+                    $cart->getOrderTotal(),
+                    $this->module->displayName,
+                    null,
+                    [],
+                    (int)$cart->id_currency,
+                    false,
+                    $customer->secure_key
+                );
                 Tools::redirect(
                     'index.php?controller=order-confirmation&id_cart=' . $cart->id . '&id_module=' . $this->module->id . '&id_order=' . $this->module->currentOrder . '&key=' . $customer->secure_key
                 );

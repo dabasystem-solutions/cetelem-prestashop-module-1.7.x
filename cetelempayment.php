@@ -63,8 +63,8 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.6.4';
-        $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => '8.2.0'];
+        $this->version = '17.6.5';
+        $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => '8.2.1'];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -111,6 +111,7 @@ class CetelemPayment extends PaymentModule
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayReassurance') &&
             $this->registerHook('displayProductAdditionalInfo') &&
+            $this->registerHook('displayCalculadoraCetelem') &&
             $this->registerHook('paymentOptions') &&
             $this->registerHook('displayPaymentReturn') &&
             $this->registerHook('actionOrderStatusPostUpdate') &&
@@ -389,6 +390,7 @@ class CetelemPayment extends PaymentModule
         $calc_position = array(
             array('calcp' => 0, 'name' => $this->l('Posición 1')),
             array('calcp' => 1, 'name' => $this->l('Posición 2')),
+            array('calcp' => 2, 'name' => $this->l('Posición 3')),
         );
 
         $carriers = Carrier::getCarriers(
@@ -1511,7 +1513,7 @@ class CetelemPayment extends PaymentModule
 
     public function hookDisplayReassurance($params)
     {
-        if (!Configuration::get('CETELEM_CALC_POSITION')) {
+        if (Configuration::get('CETELEM_CALC_POSITION') == 0) {
             return $this->calculatorHookRenderer();
         } else {
             return;
@@ -1520,7 +1522,16 @@ class CetelemPayment extends PaymentModule
 
     public function hookDisplayProductAdditionalInfo($params)
     {
-        if (Configuration::get('CETELEM_CALC_POSITION')) {
+        if (Configuration::get('CETELEM_CALC_POSITION') == 1) {
+            return $this->calculatorHookRenderer();
+        } else {
+            return;
+        }
+    }
+
+       public function hookDisplayCalculadoraCetelem($params)
+    {
+        if (Configuration::get('CETELEM_CALC_POSITION') == 2) {
             return $this->calculatorHookRenderer();
         } else {
             return;
@@ -1615,6 +1626,7 @@ class CetelemPayment extends PaymentModule
         $order_state = isset($params['newOrderStatus']) ? $params['newOrderStatus'] : $params['orderStatus'];
         switch ($order_state->id) {
             case $this->cetelemStates->StateCetelemPreApproved():
+                $this->addPayment($params);
                 $this->sendCetelemEmail('cetelem_preapproved_credit', $params['id_order'], $params['newOrderStatus']);
                 break;
             case $this->cetelemStates->StateCetelemApproved():
@@ -1634,6 +1646,89 @@ class CetelemPayment extends PaymentModule
                 break;
         }
     }
+
+
+public function addPayment($params)
+{
+    $order = (isset($params['order']) && $params['order'] instanceof Order)
+        ? $params['order']
+        : (isset($params['id_order']) ? new Order((int)$params['id_order']) : null);
+
+    $logFile = __DIR__ . '/cetelem_payment_log.txt';
+    $log = function($title, $data = []) use ($logFile) {
+        file_put_contents(
+            $logFile,
+            '['.date('Y-m-d H:i:s')."] $title\n".print_r($data, true)."\n---\n",
+            FILE_APPEND
+        );
+    };
+
+    if (!$order || !Validate::isLoadedObject($order)) {
+        $log('ADD PAYMENT - ERROR: order no cargado', ['params_keys' => array_keys($params)]);
+        return false;
+    }
+
+    $transactionId = (string) Db::getInstance()->getValue('
+        SELECT `transaction_id`
+        FROM `'._DB_PREFIX_.'cetelem_transactions`
+        WHERE `id_cart` = '.(int)$order->id_cart.'
+        ORDER BY `date_add` DESC
+    ');
+    if (!$transactionId) {
+        $transactionId = (string)Tools::getValue('IdTransaccion');
+    }
+    if (!$transactionId && isset($this->context->cookie->cetelem_transact_id)) {
+        $transactionId = (string)$this->context->cookie->cetelem_transact_id;
+    }
+
+
+    $row = [
+        'order_reference' => pSQL((string)$order->reference),
+        'id_currency'     => (int)$order->id_currency,
+        'amount'          => (float)$order->total_paid,
+        'payment_method'  => pSQL('Financiación con Cetelem'),
+        'conversion_rate' => (float)$order->conversion_rate ?: 1.000000,
+        'transaction_id'  => pSQL($transactionId !== '' ? $transactionId : '-'),
+        'card_number'     => '-',  
+        'card_brand'      => '-',
+        'card_expiration' => '-',
+        'card_holder'     => '-',
+        'date_add'        => date('Y-m-d H:i:s'),
+    ];
+
+
+        $idOrderPayment = (int)Db::getInstance()->getValue('
+            SELECT id_order_payment
+            FROM `'._DB_PREFIX_.'order_payment`
+            WHERE order_reference = "'.pSQL((string)$order->reference).'"
+            ORDER BY id_order_payment DESC
+            LIMIT 1
+        ');
+    
+
+    if ($idOrderPayment) {
+        $ok = Db::getInstance()->update('order_payment', $row, 'id_order_payment='.(int)$idOrderPayment, true, false);
+        $log('ADD PAYMENT - UPDATE', [
+            'id_order_payment' => $idOrderPayment,
+            'ok' => $ok,
+            'errno' => Db::getInstance()->getNumberError(),
+            'error' => Db::getInstance()->getMsgError(),
+            'row' => $row,
+        ]);
+    } else {
+        $ok = Db::getInstance()->insert('order_payment', $row, true, false);
+        $idOrderPayment = $ok ? (int)Db::getInstance()->Insert_ID() : 0;
+        $log('ADD PAYMENT - INSERT', [
+            'ok' => $ok,
+            'insert_id' => $idOrderPayment,
+            'errno' => Db::getInstance()->getNumberError(),
+            'error' => Db::getInstance()->getMsgError(),
+            'row' => $row,
+        ]);
+    }
+
+    return true;
+}
 
     /**
      *

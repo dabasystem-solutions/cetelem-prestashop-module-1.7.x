@@ -2,8 +2,8 @@
 <module>
     <name>cetelempayment</name>
     <displayName><![CDATA[Cetelem]]></displayName>
-    <version><![CDATA[17.6.4]]></version>
-    <ps_versions_compliancy min="1.7.0.0" max="8.2.0" />
+    <version><![CDATA[17.6.5]]></version>
+    <ps_versions_compliancy min="1.7.0.0" max="8.2.1" />
     <description><![CDATA[Customers can pay with a credit.]]></description>
     <author><![CDATA[Dabasystem solutions - https://www.dabasystem.com/]]></author>
     <tab><![CDATA[payments_gateways]]></tab>
