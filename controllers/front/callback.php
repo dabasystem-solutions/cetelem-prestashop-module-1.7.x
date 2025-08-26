@@ -49,8 +49,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         $this->cetelemStates = new CetelemStates();
     }
 
-    public function initContent()
-    {
+    public function initContent()    {
         if (Tools::getValue('getversion')) {
             $this->getModuleVersion();
             die();
@@ -97,32 +96,32 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         }
     }
 
-private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
-{
-    if (empty($idTransaccion) || empty($codigo) || empty($idCart)) {
-        $this->writeToLog("isTransactionDuplicate: parámetros inválidos o vacíos");
-        return true;
-    }
-
-    $query = new DbQuery();
-    $query->select('COUNT(*)')
-        ->from('cetelem_transactions')
-        ->where('transaction_id = "' . pSQL($idTransaccion) . '"')
-        ->where('result_code = "' . pSQL($codigo) . '"')
-        ->where('id_cart = ' . (int)$idCart);
-
-    try {
-        $count = (int) Db::getInstance()->getValue($query);
-        if ($count > 0) {
-            $this->writeToLog("isTransactionDuplicate: Transacción duplicada detectada para ID: $idTransaccion");
+    private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
+    {
+        if (empty($idTransaccion) || empty($codigo) || empty($idCart)) {
+            $this->writeToLog("isTransactionDuplicate: parámetros inválidos o vacíos");
             return true;
         }
-        return false;
-    } catch (Exception $e) {
-        $this->writeToLog("isTransactionDuplicate: Error al consultar la base de datos - " . $e->getMessage());
-        return true;
+
+        $query = new DbQuery();
+        $query->select('COUNT(*)')
+            ->from('cetelem_transactions')
+            ->where('transaction_id = "' . pSQL($idTransaccion) . '"')
+            ->where('result_code = "' . pSQL($codigo) . '"')
+            ->where('id_cart = ' . (int)$idCart);
+
+        try {
+            $count = (int) Db::getInstance()->getValue($query);
+            if ($count > 0) {
+                $this->writeToLog("isTransactionDuplicate: Transacción duplicada detectada para ID: $idTransaccion");
+                return true;
+            }
+            return false;
+        } catch (Exception $e) {
+            $this->writeToLog("isTransactionDuplicate: Error al consultar la base de datos - " . $e->getMessage());
+            return true;
+        }
     }
-}
 
     private function getIdCart($idTransaccion)
     {
@@ -133,6 +132,7 @@ private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
         
         return Db::getInstance()->getValue($query);
     }
+
     private function processTransaction()
     {
         $idTransaccion = Tools::getValue('IdTransaccion');
@@ -296,6 +296,17 @@ private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
     private function updateOrderState(Order $order, $new_state)
     {
         try {
+            $current_state = $order->getCurrentState();
+
+            // Si el nuevo estado es PRE_APPROVED y el estado actual es APPROVED, no permitir el cambio
+            if (
+            $new_state == $this->cetelemStates->StateCetelemPreApproved() &&
+            $current_state == $this->cetelemStates->StateCetelemApproved()
+            ) {
+                $this->writeToLog("No se puede poner PREAPROBADO un pedido ya APROBADO. Order ID {$order->id} -> State actual {$current_state}");
+                $this->sendStatus(8, $order->id);
+            }
+
             $order->setCurrentState($new_state);
             $order->save();
             $this->writeToLog("Order state updated: Order ID {$order->id} -> State {$new_state}");
@@ -321,8 +332,8 @@ private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
         $message .= "GET Parameters: " . json_encode($_GET) . "\n";
         $message .= "POST Parameters: " . json_encode($_POST) . "\n";
         if (filter_var(self::LOG_FILE_PATH, FILTER_VALIDATE_URL)) {
-
             file_put_contents(self::LOG_FILE_PATH, $message, FILE_APPEND);
+
         }
     }
 

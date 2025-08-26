@@ -7,6 +7,10 @@ Contact: info@dabasystem.com
 Historic changes for Cetelem
 -----------------------------------------
 
+
+VERSION 17.6.6
+[-] MO: Limitación de cambios de estados. Una vez el pedido se valide como "aprobado" no podrá cambiar a preaprobado.
+
 VERSION 17.6.4
 [-] MO: Corrección de errores, sistema de registro de transacciones y traducción de cadenas.
 
