@@ -80,7 +80,7 @@ class CetelemPayment extends PaymentModule
         $this->showEnquotas = Configuration::get('CETELEM_SHOWENCUOTAS');
         $this->showCetelem = Configuration::get('CETELEM_SHOWCETELEM');
 
-    }
+    }    
 
     public function install()
     {
@@ -2050,7 +2050,11 @@ public function addPayment($params)
     }
     
     //Recoge la version del módulo de cetelem instalada
-     private function getVersionCetelem()
+    /**
+     * Obtiene la versión del módulo de Cetelem instalado
+     * @return string|null Devuelve la versión del módulo o null si no está instalado
+    */
+    private function getVersionCetelem()
     {
         if (\Module::isInstalled('cetelempayment')) 
         {
@@ -2058,16 +2062,17 @@ public function addPayment($params)
             return $cetelemModule->version;
         } 
         return null;
-    }
-    /*
-        Gestiona el control para mostrar el mensaje de nueva versión del módulo de Cetelem
+    }    
+    /**
+     * Controla si se debe mostrar el mensaje de nueva versión del módulo de Cetelem
+     * @return void
     */
     private function controlAlertVersionCetelem()
     {        
         if(isset($_COOKIE['cetelem_version_notice']))
         {
             //Ya se ha mostrado el mensaje
-            return; 
+            return;
         }
         // Revisar la versión actual del módulo
         $versionActual = $this->getVersionCetelem();
@@ -2084,8 +2089,12 @@ public function addPayment($params)
             setcookie('cetelem_version_notice', time(), time() + 3600);//una hora
         }
     }
-
-    //revisamos la version en base a lo que reporta la API de GitHub
+    
+    /**
+     * Consulta la API de GitHub para revisar si hay una nueva versión del módulo
+     * @param string $versionActual versión actual del módulo
+     * @return array|null Devuelve un array con la información de la nueva versión o null
+    */
     private function checkNuevaVersionCetelem($versionActual)
     {
         $url = 'https://api.github.com/repos/dabasystem-solutions/cetelem-prestashop-module-1.7.x/releases/latest';
@@ -2114,8 +2123,12 @@ public function addPayment($params)
             'actual'  => $versionActual
         ];
     }
-    //Genera un popover para que sea visible en el backofice
-    //$res es el array con la información reportada de checkNuevaVersionCetelem()
+    /**
+     * Genera un popover para que sea visible en el backofice
+     * 
+     * @param array $res array asociativo con la información reportada de checkNuevaVersionCetelem()
+     * @return void
+    */
     private function mostrarMensajeVersionNueva($res)
     {
         echo '
