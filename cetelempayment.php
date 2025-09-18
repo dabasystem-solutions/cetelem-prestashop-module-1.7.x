@@ -117,6 +117,7 @@ class CetelemPayment extends PaymentModule
             $this->registerHook('actionOrderStatusPostUpdate') &&
             $this->registerHook('actionOrderStatusUpdate') &&
             $this->registerHook('actionCronJob') &&
+            $this->registerHook('displayDashboardTop') &&
             $this->cetelemStates->createCetelemPrepprovedState() &&
             $this->cetelemStates->createCetelemApprovedState() &&
             $this->cetelemStates->createCetelemDeniedState();
@@ -2039,5 +2040,133 @@ public function addPayment($params)
             }
         }
         return false;
+    }
+
+    public function hookDisplayDashboardTop()
+    {
+        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
+        //Revisa las condiciones y gestiona el mostrar el mensaje de actualizacion del módulo de Cetelem
+        $this->controlAlertVersionCetelem();
+    }
+    
+    //Recoge la version del módulo de cetelem instalada
+     private function getVersionCetelem()
+    {
+        if (\Module::isInstalled('cetelempayment')) 
+        {
+            $cetelemModule = \Module::getInstanceByName('cetelempayment');
+            return $cetelemModule->version;
+        } 
+        return null;
+    }
+    /*
+        Gestiona el control para mostrar el mensaje de nueva versión del módulo de Cetelem
+    */
+    private function controlAlertVersionCetelem()
+    {        
+        if(isset($_COOKIE['cetelem_version_notice']))
+        {
+            //Ya se ha mostrado el mensaje
+            return; 
+        }
+        // Revisar la versión actual del módulo
+        $versionActual = $this->getVersionCetelem();
+        // Revisa la versión en GitHub
+        $versionGit = $this->checkNuevaVersionCetelem($versionActual);
+        //si son diferentes, mostrar el mensaje
+        if ($versionGit && $versionGit['version'] != $versionActual) 
+        {
+            // Mostrar mensaje de nueva versión
+            $this->mostrarMensajeVersionNueva($versionGit);
+            // Guardar cookie para no mostrarlo en 24 horas
+            //setcookie('cetelem_version_notice', '1', time() + 86400, "/");
+            //guardamos la cookie para una hora
+            setcookie('cetelem_version_notice', time(), time() + 3600);//una hora
+        }
+    }
+
+    //revisamos la version en base a lo que reporta la API de GitHub
+    private function checkNuevaVersionCetelem($versionActual)
+    {
+        $url = 'https://api.github.com/repos/dabasystem-solutions/cetelem-prestashop-module-1.7.x/releases/latest';
+        $opts = 
+        [
+            "http" => [
+                "method" => "GET",
+                "header" => "User-Agent: PrestaShop\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $json = @file_get_contents($url, false, $context);
+        
+        if ($json === false) 
+        {
+            return null;
+        }
+        
+        $data = json_decode($json, true);
+        
+        return 
+        [
+            'version' => $data['tag_name'] ?? null,
+            'mensaje' => $data['body'] ?? null,
+            'titulo'  => $data['name'] ?? null,
+            'actual'  => $versionActual
+        ];
+    }
+    //Genera un popover para que sea visible en el backofice
+    //$res es el array con la información reportada de checkNuevaVersionCetelem()
+    private function mostrarMensajeVersionNueva($res)
+    {
+        echo '
+            <style>
+                #cetelem-popover-btn:hover,
+                #cetelem-popover-btn:focus,
+                #cetelem-popover-btn:active 
+                {
+                    background-color: #28a745 !important;
+                    color: #fff !important;
+                    border-color: #28a745 !important;
+                    box-shadow: none !important;
+                }
+                #cetelem-popover-container
+                {
+                    position:absolute;
+                    top:10px;
+                    right:25px;
+                    z-index:9999;
+                }
+            </style>
+            <div id="cetelem-popover-container" >
+                <button id="cetelem-popover-btn" type="button" class="btn btn-success" data-toggle="popover">
+                    <h3 style="color:#fff;">Módulo de Cetelem: ' . htmlspecialchars($res["version"]) . '</h3>
+                    <p style="display:flex; flex-flow:column; gap:20px;" >' . htmlspecialchars($res["mensaje"]) . '
+                        <div>
+                            <a class="btn btn-primary" 
+                            href="https://moduloscetelem.dabasystem.com" target="_blank">
+                                Ir a Módulos Cetelem
+                            </a>
+                            <a class="btn btn-secondary" 
+                            onclick="
+                                document.getElementById(\'cetelem-popover-container\').style.display = \'none\';
+                            " >Cerrar</a>
+                        </div>
+                    </p>
+                </button>
+            </div>
+            <script>
+                (function(){
+                    var popoverBtn = document.getElementById("cetelem-popover-btn");
+                    if (window.jQuery && typeof jQuery.fn.popover === "function") {
+                        jQuery(function($){
+                            $("#cetelem-popover-btn").popover("show");
+                            setTimeout(function(){
+                                $("#cetelem-popover-container").fadeOut();
+                            }, 1000000);
+                        });
+                    }
+                })();
+            </script>
+        ';
     }
 }
