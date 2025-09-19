@@ -2133,14 +2133,15 @@ public function addPayment($params)
     {
         echo '
             <style>
+                #cetelem-popover-btn,
                 #cetelem-popover-btn:hover,
                 #cetelem-popover-btn:focus,
                 #cetelem-popover-btn:active 
                 {
-                    background-color: #28a745 !important;
-                    color: #fff !important;
-                    border-color: #28a745 !important;
-                    box-shadow: none !important;
+                    background-color: white;
+                    border: solid 2px #269234;
+                    border-radius: 0px;
+                    padding: 5%;
                 }
                 #cetelem-popover-container
                 {
@@ -2149,23 +2150,84 @@ public function addPayment($params)
                     right:25px;
                     z-index:9999;
                 }
+                #cetelem-popover-container:hover
+                {
+                    cursor: default;
+                }
+                .titulo-aviso-cetelem-update
+                {
+                    font-size: 18pt;
+                    font-weight: 800;
+                }
+                .mensaje-aviso-cetelem-update
+                {
+                    display:flex; 
+                    flex-flow:column; 
+                    gap:20px;
+                    margin-top: 10%;
+                }
+                #info-nuevo-modulo-cetelem
+                {
+                    font-size: 16pt;
+                    font-weight: 600;
+                }
+                .btn-cetelem, .btn-cetelem:hover,
+                {                    
+                    color: white !important;
+                    transition: color 0.15s 
+                    ease-in-out, background-color 0.15s 
+                    ease-in-out, border-color 0.15s 
+                    ease-in-out, box-shadow 0.15s 
+                    ease-in-out, -webkit-box-shadow 0.15s 
+                    ease-in-out;
+                }
+                .btn-cetelem-modulos
+                {                
+                    color:white !important;
+                    background-color: #269234;
+                    border-color: #269234;
+                }
+                .btn-cetelem-modulos:hover
+                {
+                    color:white !important;
+                    background-color: #2fb041ff;
+                    border-color: #2fb041ff;
+                }
+                
+                #contenedor-botones-aviso-cetelem
+                {
+                    display: flex;
+                    flex-flow: row;                    
+                    margin-top: 10%;
+                    justify-content: center;
+                    gap: 7%;                    
+                }
+                #contenedor-botones-aviso-cetelem a
+                {
+                    border-radius: 10px !important;
+                    padding: 2%;
+                    padding-left: 5%;
+                    padding-right: 5%;
+                }
             </style>
             <div id="cetelem-popover-container" >
-                <button id="cetelem-popover-btn" type="button" class="btn btn-success" data-toggle="popover">
-                    <h3 style="color:#fff;">Módulo de Cetelem: ' . htmlspecialchars($res["version"]) . '</h3>
-                    <p style="display:flex; flex-flow:column; gap:20px;" >' . htmlspecialchars($res["mensaje"]) . '
-                        <div>
-                            <a class="btn btn-primary" 
+                <div id="cetelem-popover-btn" class="btn" data-toggle="popover">
+                    <h3 class="titulo-aviso-cetelem-update" >Hay una nueva actualización</h3>
+                    <h3 class="titulo-aviso-cetelem-update" >módulo Cetelem: '. htmlspecialchars($res["version"]).'</h3>
+                    <p class="mensaje-aviso-cetelem-update" >
+                        <span id="info-nuevo-modulo-cetelem">' . htmlspecialchars($res["mensaje"]) . '</span>
+                        <div id="contenedor-botones-aviso-cetelem" >
+                            <a class="btn btn-cetelem btn-cetelem-modulos" 
                             href="https://moduloscetelem.dabasystem.com" target="_blank">
-                                Ir a Módulos Cetelem
+                                Ir a módulos Cetelem
                             </a>
-                            <a class="btn btn-secondary" 
+                            <a class="btn btn-secondary btn-cetelem" 
                             onclick="
                                 document.getElementById(\'cetelem-popover-container\').style.display = \'none\';
                             " >Cerrar</a>
                         </div>
                     </p>
-                </button>
+                </div>
             </div>
             <script>
                 (function(){
