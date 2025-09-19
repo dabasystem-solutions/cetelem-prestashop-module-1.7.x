@@ -2040,4 +2040,35 @@ public function addPayment($params)
         }
         return false;
     }
+
+    public function hookDisplayDashboardTop()
+    {
+        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
+        
+        
+
+        //Miramos de registrar el usuario actual como activo de Cetelem
+        $this->getionarUsuarioEcomerce();
+
+    }
+
+
+    /**
+     *Se encarga de gestionar y registrar el usuario de BackOffice actual como activo de Cetelem
+     * @return void
+    */
+    private function getionarUsuarioEcomerce()
+    {
+        /*/iniciamos el proceso de registro del usuario
+        //* Se revisa si el usuario ya está registrado
+        //* si no lo está , se intentará registrar
+        //* Si ya está registrado, se revisa su estado y si esta como no activo, se modifica por PUT
+        //* Si el usuario esta activo, no se hace nada
+        */
+        RegistroUsuarioEcomerce::registrarUsuarioEcomerceCetelem
+        (
+            $this->context->employee->firstname." ".$this->context->employee->lastname, 
+            $this->context->employee->email        
+        );
+    }
 }
