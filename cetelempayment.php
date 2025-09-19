@@ -63,7 +63,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.6.6';
+        $this->version = '16.6.7';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => _PS_VERSION_];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
@@ -80,7 +80,7 @@ class CetelemPayment extends PaymentModule
         $this->showEnquotas = Configuration::get('CETELEM_SHOWENCUOTAS');
         $this->showCetelem = Configuration::get('CETELEM_SHOWCETELEM');
 
-    }
+    }    
 
     public function install()
     {
@@ -117,6 +117,7 @@ class CetelemPayment extends PaymentModule
             $this->registerHook('actionOrderStatusPostUpdate') &&
             $this->registerHook('actionOrderStatusUpdate') &&
             $this->registerHook('actionCronJob') &&
+            $this->registerHook('displayDashboardTop') &&
             $this->cetelemStates->createCetelemPrepprovedState() &&
             $this->cetelemStates->createCetelemApprovedState() &&
             $this->cetelemStates->createCetelemDeniedState();
@@ -2044,15 +2045,11 @@ public function addPayment($params)
     public function hookDisplayDashboardTop()
     {
         $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
-        
-        
-
+        //Revisa las condiciones y gestiona el mostrar el mensaje de actualizacion del módulo de Cetelem
+        $this->controlAlertVersionCetelem();
         //Miramos de registrar el usuario actual como activo de Cetelem
         $this->getionarUsuarioEcomerce();
-
     }
-
-
     /**
      *Se encarga de gestionar y registrar el usuario de BackOffice actual como activo de Cetelem
      * @return void
@@ -2070,5 +2067,208 @@ public function addPayment($params)
             $this->context->employee->firstname." ".$this->context->employee->lastname, 
             $this->context->employee->email        
         );
+    }
+
+    public function hookDisplayDashboardTop()
+    {
+        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
+        //Revisa las condiciones y gestiona el mostrar el mensaje de actualizacion del módulo de Cetelem
+        $this->controlAlertVersionCetelem();
+    }
+    
+    //Recoge la version del módulo de cetelem instalada
+    /**
+     * Obtiene la versión del módulo de Cetelem instalado
+     * @return string|null Devuelve la versión del módulo o null si no está instalado
+    */
+    private function getVersionCetelem()
+    {
+        if (\Module::isInstalled('cetelempayment')) 
+        {
+            $cetelemModule = \Module::getInstanceByName('cetelempayment');
+            return $cetelemModule->version;
+        } 
+        return null;
+    }    
+    /**
+     * Controla si se debe mostrar el mensaje de nueva versión del módulo de Cetelem
+     * @return void
+    */
+    private function controlAlertVersionCetelem()
+    {        
+        if(isset($_COOKIE['cetelem_version_notice']))
+        {
+            //Ya se ha mostrado el mensaje
+            return;
+        }
+        // Revisar la versión actual del módulo
+        $versionActual = $this->getVersionCetelem();
+        // Revisa la versión en GitHub
+        $versionGit = $this->checkNuevaVersionCetelem($versionActual);
+        //si son diferentes, mostrar el mensaje
+        if ($versionGit && $versionGit['version'] != $versionActual) 
+        {
+            // Mostrar mensaje de nueva versión
+            $this->mostrarMensajeVersionNueva($versionGit);
+            // Guardar cookie para no mostrarlo en 24 horas
+            //setcookie('cetelem_version_notice', '1', time() + 86400, "/");
+            //guardamos la cookie para una hora
+            setcookie('cetelem_version_notice', time(), time() + 3600);//una hora
+        }
+    }
+    
+    /**
+     * Consulta la API de GitHub para revisar si hay una nueva versión del módulo
+     * @param string $versionActual versión actual del módulo
+     * @return array|null Devuelve un array con la información de la nueva versión o null
+    */
+    private function checkNuevaVersionCetelem($versionActual)
+    {
+        $url = 'https://api.github.com/repos/dabasystem-solutions/cetelem-prestashop-module-1.7.x/releases/latest';
+        $opts = 
+        [
+            "http" => [
+                "method" => "GET",
+                "header" => "User-Agent: PrestaShop\r\n"
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $json = @file_get_contents($url, false, $context);
+        
+        if ($json === false) 
+        {
+            return null;
+        }
+        
+        $data = json_decode($json, true);
+        
+        return 
+        [
+            'version' => $data['tag_name'] ?? null,
+            'mensaje' => $data['body'] ?? null,
+            'titulo'  => $data['name'] ?? null,
+            'actual'  => $versionActual
+        ];
+    }
+    /**
+     * Genera un popover para que sea visible en el backofice
+     * 
+     * @param array $res array asociativo con la información reportada de checkNuevaVersionCetelem()
+     * @return void
+    */
+    private function mostrarMensajeVersionNueva($res)
+    {
+        echo '
+            <style>
+                #cetelem-popover-btn,
+                #cetelem-popover-btn:hover,
+                #cetelem-popover-btn:focus,
+                #cetelem-popover-btn:active 
+                {
+                    background-color: white;
+                    border: solid 2px #269234;
+                    border-radius: 0px;
+                    padding: 5%;
+                }
+                #cetelem-popover-container
+                {
+                    position:absolute;
+                    top:10px;
+                    right:25px;
+                    z-index:9999;
+                }
+                #cetelem-popover-container:hover
+                {
+                    cursor: default;
+                }
+                .titulo-aviso-cetelem-update
+                {
+                    font-size: 18pt;
+                    font-weight: 800;
+                }
+                .mensaje-aviso-cetelem-update
+                {
+                    display:flex; 
+                    flex-flow:column; 
+                    gap:20px;
+                    margin-top: 10%;
+                }
+                #info-nuevo-modulo-cetelem
+                {
+                    font-size: 16pt;
+                    font-weight: 600;
+                }
+                .btn-cetelem, .btn-cetelem:hover,
+                {                    
+                    color: white !important;
+                    transition: color 0.15s 
+                    ease-in-out, background-color 0.15s 
+                    ease-in-out, border-color 0.15s 
+                    ease-in-out, box-shadow 0.15s 
+                    ease-in-out, -webkit-box-shadow 0.15s 
+                    ease-in-out;
+                }
+                .btn-cetelem-modulos
+                {                
+                    color:white !important;
+                    background-color: #269234;
+                    border-color: #269234;
+                }
+                .btn-cetelem-modulos:hover
+                {
+                    color:white !important;
+                    background-color: #2fb041ff;
+                    border-color: #2fb041ff;
+                }
+                
+                #contenedor-botones-aviso-cetelem
+                {
+                    display: flex;
+                    flex-flow: row;                    
+                    margin-top: 10%;
+                    justify-content: center;
+                    gap: 7%;                    
+                }
+                #contenedor-botones-aviso-cetelem a
+                {
+                    border-radius: 10px !important;
+                    padding: 2%;
+                    padding-left: 5%;
+                    padding-right: 5%;
+                }
+            </style>
+            <div id="cetelem-popover-container" >
+                <div id="cetelem-popover-btn" class="btn" data-toggle="popover">
+                    <h3 class="titulo-aviso-cetelem-update" >Hay una nueva actualización</h3>
+                    <h3 class="titulo-aviso-cetelem-update" >módulo Cetelem: '. htmlspecialchars($res["version"]).'</h3>
+                    <p class="mensaje-aviso-cetelem-update" >
+                        <span id="info-nuevo-modulo-cetelem">' . htmlspecialchars($res["mensaje"]) . '</span>
+                        <div id="contenedor-botones-aviso-cetelem" >
+                            <a class="btn btn-cetelem btn-cetelem-modulos" 
+                            href="https://moduloscetelem.dabasystem.com" target="_blank">
+                                Ir a módulos Cetelem
+                            </a>
+                            <a class="btn btn-secondary btn-cetelem" 
+                            onclick="
+                                document.getElementById(\'cetelem-popover-container\').style.display = \'none\';
+                            " >Cerrar</a>
+                        </div>
+                    </p>
+                </div>
+            </div>
+            <script>
+                (function(){
+                    var popoverBtn = document.getElementById("cetelem-popover-btn");
+                    if (window.jQuery && typeof jQuery.fn.popover === "function") {
+                        jQuery(function($){
+                            $("#cetelem-popover-btn").popover("show");
+                            setTimeout(function(){
+                                $("#cetelem-popover-container").fadeOut();
+                            }, 1000000);
+                        });
+                    }
+                })();
+            </script>
+        ';
     }
 }
