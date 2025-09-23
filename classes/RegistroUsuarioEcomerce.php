@@ -1,7 +1,7 @@
 <?php
+
 class RegistroUsuarioEcomerce
-{
-    //TODO: mirar de sacar este valor por un fichero .env o similar
+{    
     public static $API_KEY = "810f0adf11b2c3eea024aeebfbc8c9b8";
     public static $BASE_URL = 'https://cetelem.crmlab.eu/api/v1/Account';
     /**
@@ -11,22 +11,23 @@ class RegistroUsuarioEcomerce
      * @return void
     */
     public static function registrarUsuarioEcomerceCetelem($nombre, $email)
-    {        
+    {
         //Buscamos el usuario por su email
         $usuario = RegistroUsuarioEcomerce::checkUsuarioRegistrado($email);
         if($usuario !== false)
         {
             //se revisa si está activo, si es así, no hacemos nada
             // si no lo está, se marca como activo
+            //El usuario ya está registrado y activo en Cetelem
             if($usuario->type == "Activo" || strtolower($usuario->type) == "activo")
-            {                
+            {
                 return;
-            }
-            //marcamos el usuario como activo            
+            }            
+            //Vamos a marcar el usuario como activo
             RegistroUsuarioEcomerce::modificarActivo($usuario->id);
             return;
         }
-        //Es un nuevo usuario que se debe de registrar        
+        //Es un nuevo usuario que se debe de registrar    
         //nueve digitos aleatorios + el "+34" para el prefijo de telefono
         $idUnico = "+34".substr(number_format(microtime(true) * 1000000, 0, '', ''), -9);
 
@@ -118,10 +119,8 @@ class RegistroUsuarioEcomerce
         {
             //No hacemos nada
             // No interesa gestionar este proceso
-            //echo("ERROR<br>");
-            //var_dump($e->getMessage());
         }
-        curl_close($curl);
+        curl_close($curl);        
         return false;
     }
 
@@ -141,8 +140,7 @@ class RegistroUsuarioEcomerce
         try
         {
             // URL final con el ID al final
-            $url = RegistroUsuarioEcomerce::$BASE_URL . '/' . urlencode($idUsuario);            
-
+            $url = RegistroUsuarioEcomerce::$BASE_URL . '/' . urlencode($idUsuario);
             // Headers personalizados
             $headers = 
             [
@@ -158,20 +156,22 @@ class RegistroUsuarioEcomerce
             ]);
 
             // Initialize cURL session
-            $ch = curl_init();
+            $ch = curl_init();            
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Para capturar respuesta
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);            
-            curl_exec($ch);            
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            // Execute the request and get the response
+            $response = curl_exec($ch);
+            // Close the cURL session
+            curl_close($ch);            
         }
         catch(Exception $e)
-        {            
-            // echo("ERROR<br>");
-            // var_dump($e->getMessage());
+        {
+            curl_close($ch);            
         }
-        curl_close($ch);
     }
     /**
      * Registra un nuevo usuario como activo de Cetelem en la BD
@@ -207,14 +207,13 @@ class RegistroUsuarioEcomerce
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_exec($ch);
+
+            $data = curl_exec($ch);     
         }
         catch(Exception $e)
         {
             //No hacemos nada
-            // No interesa gestionar este proceso
-            // echo("ERROR<br>");
-            // var_dump($e->getMessage());
+            // No interesa gestionar este proceso            
         }
         curl_close($ch);
     }
@@ -265,7 +264,6 @@ class UsuarioEcomerce
         {
             //Para estos casos, si hay un error, dejamos el objecto como esté y
             //los campos que no estén completados, quedarán como ""
-            //No deberia de llegar nunca aquí
         }
     }
 }

@@ -183,10 +183,7 @@ class CetelemPaymentModuleFrontController extends ModuleFrontController
 
         $result = Db::getInstance()->insert('cetelem_transactions', $data);
 
-        if (!$result) {
-
-            $this->writeToLog("Failed to save transaction in DB: $idTransaccion");
-
+        if (!$result) {           
             PrestaShopLogger::addLog(
                 'Cetelem::CallBack - DB Insert Error',
                 3,
