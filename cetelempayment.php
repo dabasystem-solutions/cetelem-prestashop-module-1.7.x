@@ -25,7 +25,6 @@
  */
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -63,7 +62,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '16.6.7';
+        $this->version = '17.6.7';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => _PS_VERSION_];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
@@ -79,8 +78,9 @@ class CetelemPayment extends PaymentModule
         $this->description = $this->l('Customers can pay with a credit.');
         $this->showEnquotas = Configuration::get('CETELEM_SHOWENCUOTAS');
         $this->showCetelem = Configuration::get('CETELEM_SHOWCETELEM');
+        require_once __DIR__ . '/classes/RegistroUsuarioEcomerce.php';
 
-    }    
+    }
 
     public function install()
     {
@@ -1011,6 +1011,23 @@ class CetelemPayment extends PaymentModule
         return $helper->generateForm($this->fields_form);
     }
 
+    public function hookHeader()
+    {
+        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
+
+    }
+
+    public function hookDisplayDashboardTop()
+    {
+        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
+        // Validar si estamos en la página de configuración de este módulo
+        $this->controlAlertVersionCetelem();
+
+        //Miramos de registrar el usuario actual como activo de Cetelem
+        $this->getionarUsuarioEcomenrce();
+
+    }
+
     public function hookDisplayHeader()
     {
         if (version_compare(_PS_VERSION_, '1.6', '<')) {
@@ -1374,10 +1391,17 @@ class CetelemPayment extends PaymentModule
         } else if ($this->hasSpecialMaterial()) {
             $material = '333';
         }
-        $callback = $this->context->link->getModuleLink( $this->name, 'callback');
-        if ($encuotas) {
+        $callback = null;
+        
+        if ($encuotas) 
+        {
             $callback = $this->context->link->getModuleLink( $this->name, 'callback', array('encuotas' => 1));
         }
+        else
+        {
+            $this->context->link->getModuleLink( $this->name, 'callback');
+        }
+
         $this->context->smarty->assign(array('addCetelemScript' => true, 'material' => $material));
         $externalOption->setCallToActionText($payment_text)
             ->setModuleName($this->name)
@@ -1647,89 +1671,87 @@ class CetelemPayment extends PaymentModule
                 break;
         }
     }
+    public function addPayment($params)
+    {
+        $order = (isset($params['order']) && $params['order'] instanceof Order)
+            ? $params['order']
+            : (isset($params['id_order']) ? new Order((int)$params['id_order']) : null);
 
+        $logFile = __DIR__ . '/cetelem_payment_log.txt';
+        $log = function($title, $data = []) use ($logFile) {
+            file_put_contents(
+                $logFile,
+                '['.date('Y-m-d H:i:s')."] $title\n".print_r($data, true)."\n---\n",
+                FILE_APPEND
+            );
+        };
 
-public function addPayment($params)
-{
-    $order = (isset($params['order']) && $params['order'] instanceof Order)
-        ? $params['order']
-        : (isset($params['id_order']) ? new Order((int)$params['id_order']) : null);
+        if (!$order || !Validate::isLoadedObject($order)) {
+            $log('ADD PAYMENT - ERROR: order no cargado', ['params_keys' => array_keys($params)]);
+            return false;
+        }
 
-    $logFile = __DIR__ . '/cetelem_payment_log.txt';
-    $log = function($title, $data = []) use ($logFile) {
-        file_put_contents(
-            $logFile,
-            '['.date('Y-m-d H:i:s')."] $title\n".print_r($data, true)."\n---\n",
-            FILE_APPEND
-        );
-    };
-
-    if (!$order || !Validate::isLoadedObject($order)) {
-        $log('ADD PAYMENT - ERROR: order no cargado', ['params_keys' => array_keys($params)]);
-        return false;
-    }
-
-    $transactionId = (string) Db::getInstance()->getValue('
-        SELECT `transaction_id`
-        FROM `'._DB_PREFIX_.'cetelem_transactions`
-        WHERE `id_cart` = '.(int)$order->id_cart.'
-        ORDER BY `date_add` DESC
-    ');
-    if (!$transactionId) {
-        $transactionId = (string)Tools::getValue('IdTransaccion');
-    }
-    if (!$transactionId && isset($this->context->cookie->cetelem_transact_id)) {
-        $transactionId = (string)$this->context->cookie->cetelem_transact_id;
-    }
-
-
-    $row = [
-        'order_reference' => pSQL((string)$order->reference),
-        'id_currency'     => (int)$order->id_currency,
-        'amount'          => (float)$order->total_paid,
-        'payment_method'  => pSQL('Financiación con Cetelem'),
-        'conversion_rate' => (float)$order->conversion_rate ?: 1.000000,
-        'transaction_id'  => pSQL($transactionId !== '' ? $transactionId : '-'),
-        'card_number'     => '-',  
-        'card_brand'      => '-',
-        'card_expiration' => '-',
-        'card_holder'     => '-',
-        'date_add'        => date('Y-m-d H:i:s'),
-    ];
-
-
-        $idOrderPayment = (int)Db::getInstance()->getValue('
-            SELECT id_order_payment
-            FROM `'._DB_PREFIX_.'order_payment`
-            WHERE order_reference = "'.pSQL((string)$order->reference).'"
-            ORDER BY id_order_payment DESC
-            LIMIT 1
+        $transactionId = (string) Db::getInstance()->getValue('
+            SELECT `transaction_id`
+            FROM `'._DB_PREFIX_.'cetelem_transactions`
+            WHERE `id_cart` = '.(int)$order->id_cart.'
+            ORDER BY `date_add` DESC
         ');
-    
+        if (!$transactionId) {
+            $transactionId = (string)Tools::getValue('IdTransaccion');
+        }
+        if (!$transactionId && isset($this->context->cookie->cetelem_transact_id)) {
+            $transactionId = (string)$this->context->cookie->cetelem_transact_id;
+        }
 
-    if ($idOrderPayment) {
-        $ok = Db::getInstance()->update('order_payment', $row, 'id_order_payment='.(int)$idOrderPayment, true, false);
-        $log('ADD PAYMENT - UPDATE', [
-            'id_order_payment' => $idOrderPayment,
-            'ok' => $ok,
-            'errno' => Db::getInstance()->getNumberError(),
-            'error' => Db::getInstance()->getMsgError(),
-            'row' => $row,
-        ]);
-    } else {
-        $ok = Db::getInstance()->insert('order_payment', $row, true, false);
-        $idOrderPayment = $ok ? (int)Db::getInstance()->Insert_ID() : 0;
-        $log('ADD PAYMENT - INSERT', [
-            'ok' => $ok,
-            'insert_id' => $idOrderPayment,
-            'errno' => Db::getInstance()->getNumberError(),
-            'error' => Db::getInstance()->getMsgError(),
-            'row' => $row,
-        ]);
+
+        $row = [
+            'order_reference' => pSQL((string)$order->reference),
+            'id_currency'     => (int)$order->id_currency,
+            'amount'          => (float)$order->total_paid,
+            'payment_method'  => pSQL('Financiación con Cetelem'),
+            'conversion_rate' => (float)$order->conversion_rate ?: 1.000000,
+            'transaction_id'  => pSQL($transactionId !== '' ? $transactionId : '-'),
+            'card_number'     => '-',  
+            'card_brand'      => '-',
+            'card_expiration' => '-',
+            'card_holder'     => '-',
+            'date_add'        => date('Y-m-d H:i:s'),
+        ];
+
+
+            $idOrderPayment = (int)Db::getInstance()->getValue('
+                SELECT id_order_payment
+                FROM `'._DB_PREFIX_.'order_payment`
+                WHERE order_reference = "'.pSQL((string)$order->reference).'"
+                ORDER BY id_order_payment DESC
+                
+            ');
+        
+
+        if ($idOrderPayment) {
+            $ok = Db::getInstance()->update('order_payment', $row, 'id_order_payment='.(int)$idOrderPayment, true, false);
+            $log('ADD PAYMENT - UPDATE', [
+                'id_order_payment' => $idOrderPayment,
+                'ok' => $ok,
+                'errno' => Db::getInstance()->getNumberError(),
+                'error' => Db::getInstance()->getMsgError(),
+                'row' => $row,
+            ]);
+        } else {
+            $ok = Db::getInstance()->insert('order_payment', $row, true, false);
+            $idOrderPayment = $ok ? (int)Db::getInstance()->Insert_ID() : 0;
+            $log('ADD PAYMENT - INSERT', [
+                'ok' => $ok,
+                'insert_id' => $idOrderPayment,
+                'errno' => Db::getInstance()->getNumberError(),
+                'error' => Db::getInstance()->getMsgError(),
+                'row' => $row,
+            ]);
+        }
+
+        return true;
     }
-
-    return true;
-}
 
     /**
      *
@@ -1769,7 +1791,12 @@ public function addPayment($params)
     }
 
     public function hookActionOrderStatusUpdate($params)
-    {
+    {        
+        $order = new Order((int)$params['id_order']);
+        //Si no es de CETELEM, salimos
+        if ($order->payment != 'cetelempayment'){
+            return;
+        }
         $tmp_order = new Order((int)$params['id_order']);
         $tmp_payment = $tmp_order->payment;
         if ($tmp_payment == 'cetelempayment' && (int)$tmp_order->current_state == (int)Configuration::get('PS_OS_CANCELED')) {
@@ -2042,41 +2069,7 @@ public function addPayment($params)
         return false;
     }
 
-    public function hookDisplayDashboardTop()
-    {
-        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
-        //Revisa las condiciones y gestiona el mostrar el mensaje de actualizacion del módulo de Cetelem
-        $this->controlAlertVersionCetelem();
-        //Miramos de registrar el usuario actual como activo de Cetelem
-        $this->getionarUsuarioEcomerce();
-    }
-    /**
-     *Se encarga de gestionar y registrar el usuario de BackOffice actual como activo de Cetelem
-     * @return void
-    */
-    private function getionarUsuarioEcomerce()
-    {
-        /*/iniciamos el proceso de registro del usuario
-        //* Se revisa si el usuario ya está registrado
-        //* si no lo está , se intentará registrar
-        //* Si ya está registrado, se revisa su estado y si esta como no activo, se modifica por PUT
-        //* Si el usuario esta activo, no se hace nada
-        */
-        RegistroUsuarioEcomerce::registrarUsuarioEcomerceCetelem
-        (
-            $this->context->employee->firstname." ".$this->context->employee->lastname, 
-            $this->context->employee->email        
-        );
-    }
-
-    public function hookDisplayDashboardTop()
-    {
-        $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
-        //Revisa las condiciones y gestiona el mostrar el mensaje de actualizacion del módulo de Cetelem
-        $this->controlAlertVersionCetelem();
-    }
-    
-    //Recoge la version del módulo de cetelem instalada
+     //Recoge la version del módulo de cetelem instalada
     /**
      * Obtiene la versión del módulo de Cetelem instalado
      * @return string|null Devuelve la versión del módulo o null si no está instalado
@@ -2089,34 +2082,12 @@ public function addPayment($params)
             return $cetelemModule->version;
         } 
         return null;
-    }    
-    /**
-     * Controla si se debe mostrar el mensaje de nueva versión del módulo de Cetelem
-     * @return void
-    */
-    private function controlAlertVersionCetelem()
-    {        
-        if(isset($_COOKIE['cetelem_version_notice']))
-        {
-            //Ya se ha mostrado el mensaje
-            return;
-        }
-        // Revisar la versión actual del módulo
-        $versionActual = $this->getVersionCetelem();
-        // Revisa la versión en GitHub
-        $versionGit = $this->checkNuevaVersionCetelem($versionActual);
-        //si son diferentes, mostrar el mensaje
-        if ($versionGit && $versionGit['version'] != $versionActual) 
-        {
-            // Mostrar mensaje de nueva versión
-            $this->mostrarMensajeVersionNueva($versionGit);
-            // Guardar cookie para no mostrarlo en 24 horas
-            //setcookie('cetelem_version_notice', '1', time() + 86400, "/");
-            //guardamos la cookie para una hora
-            setcookie('cetelem_version_notice', time(), time() + 3600);//una hora
-        }
     }
-    
+
+    private function isInPaymentMethodsSection()
+    {
+        return isset($_GET['controller']) && $_GET['controller'] === 'AdminPayment';
+    }
     /**
      * Consulta la API de GitHub para revisar si hay una nueva versión del módulo
      * @param string $versionActual versión actual del módulo
@@ -2270,5 +2241,45 @@ public function addPayment($params)
                 })();
             </script>
         ';
+    }
+
+    private function controlAlertVersionCetelem()
+    {        
+        if(isset($_COOKIE['cetelem_version_notice']))
+        {
+            //Ya se ha mostrado el mensaje
+            return; 
+        }
+        // 2. Revisar la versión actual del módulo
+        $versionActual = $this->getVersionCetelem();
+        // 3. Revisar si hay una versión nueva
+        $versionGit = $this->checkNuevaVersionCetelem($versionActual);
+
+        if ($versionGit && $versionGit['version'] != $versionActual) 
+        {
+            // Mostrar mensaje de nueva versión
+            $this->mostrarMensajeVersionNueva($versionGit);
+            // Guardar cookie para no mostrarlo en 24 horas            
+            setcookie('cetelem_version_notice', time(), time() + 3600);//una hora
+        }
+    }
+
+    /**
+     *Se encarga de gestionar y registrar el usuario de BackOffice actual como activo de Cetelem
+     * @return void
+    */
+    private function getionarUsuarioEcomenrce()
+    {
+        /*/iniciamos el proceso de registro del usuario
+        //* Se revisa si el usuario ya está registrado
+        //* si no lo está , se intentará registrar
+        //* Si ya está registrado, se revisa su estado y si esta como no activo, se modifica por PUT
+        //* Si el usuario esta activo, no se hace nada
+        */
+        RegistroUsuarioEcomerce::registrarUsuarioEcomerceCetelem
+        (
+            $this->context->employee->firstname." ".$this->context->employee->lastname, 
+            $this->context->employee->email        
+        );
     }
 }
