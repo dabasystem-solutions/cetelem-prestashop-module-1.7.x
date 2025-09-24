@@ -52,7 +52,7 @@
 
         {$connection_data}
         {$config_data}
-
+        {$config_motorcycle_data}
         <div class="faq-section mb-4">
     <div class="faq-section-header mb-4">
         <div class="d-flex align-items-center faq-header-inner">
