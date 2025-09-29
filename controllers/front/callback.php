@@ -39,9 +39,10 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
     //DETERMINA SI SE DEBEN DE ALMACENAR LOS LOGS.
     //UTIL PARA CUANDO SE DEBE DE RASTREAR ALGUN PROBLEMA
     private const ACTIVE_LOGS = false;
-
-    private static ?string $logFilePath = null;
-
+    /**
+     * @var string|null
+     */
+    private static $logFilePath = null;
     private $cetelemStates;
 
     public function __construct()
