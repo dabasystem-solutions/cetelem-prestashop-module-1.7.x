@@ -207,8 +207,9 @@ class RegistroUsuarioEcomerce
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-            $data = curl_exec($ch);     
+            $data = curl_exec($ch); // evita que la respuesta de la API se imprima.
         }
         catch(Exception $e)
         {
