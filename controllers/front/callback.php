@@ -322,7 +322,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         if ($order->id) 
         {
             // agrega la nota interna del pedido
-            $note = 'Pedido Tienda: ' . $order->reference . ' - Pedido Cetelem: ' . pSQL($idTransaccion);
+            $note = 'ID transacción: ' . $order->reference . ' - ID transacción Cetelem: ' . pSQL($idTransaccion);
             $order->note = $note;
             $order->save();
 
