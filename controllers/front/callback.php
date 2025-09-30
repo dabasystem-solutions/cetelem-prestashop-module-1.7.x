@@ -364,19 +364,29 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
     {
         $this->writeToDebug('INIT updateOrderState');
 
-        try {
+        try
+        {
             $current_state = $order->getCurrentState();
             $this->writeToDebug($new_state." == ".$this->cetelemStates->StateCetelemPreApproved()." && ". $current_state ." == ".$this->cetelemStates->StateCetelemApproved()."');" );
+            //Si el pedido ya estaba cancelado, no debe de poder cambiar de estado
+            if($current_state == $this->cetelemStates->StateCetelemDenied())
+            {
+                //Si esta denegado/cancelado, no debe de permitirse ningún cambio                
+                $this->writeToDebug("No se puede cambiar el estado de un pedido ya Cancelado. 
+                                    Order ID {$order->id} -> State actual {$current_state}");
+                $this->sendStatus(8, $order->id);
+            }
+            
             // Si el nuevo estado es PRE_APPROVED y el estado actual es APPROVED, no permitir el cambio
             if 
             (
                 $new_state == $this->cetelemStates->StateCetelemPreApproved() &&
-                $current_state == $this->cetelemStates->StateCetelemApproved()
+                $current_state == $this->cetelemStates->StateCetelemApproved()                
             ) 
             {
                 $this->writeToDebug('updateOrderState :PREAPROBADO un pedido ya APROBADO ');
                 $this->writeToDebug("No se puede poner PREAPROBADO un pedido ya APROBADO. Order ID {$order->id} -> State actual {$current_state}");
-                $this->sendStatus(8, $order->id);            
+                $this->sendStatus(8, $order->id);
             }
             $this->writeToDebug('updateOrderState set new_state');
             $this->writeToDebug("updateOrderState newState == " . print_r($new_state, true));
