@@ -206,7 +206,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         $this->writeToDebug('processTransaction updateTransactionToDatabase()');
         $this->updateTransactionToDatabase($idTransaccion, $codResultado, $id_cart);
         $this->writeToDebug('processTransaction validateOrder()');
-        $this->validateOrder($cart, $codResultado);
+        $this->validateOrder($cart, $codResultado, $idTransaccion);
         $this->writeToDebug('END processTransaction');
     }
 
@@ -238,7 +238,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
     }
 
 
-    private function validateOrder($cart, $codResultado)
+    private function validateOrder($cart, $codResultado, $idTransaccion)
     {
         $this->writeToDebug('INIT validateOrder');
         $customer = new Customer($cart->id_customer);
@@ -287,7 +287,7 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         );
         $this->writeToDebug("Pedido validado con código: $codResultado y Estado $orderState");
         $this->writeToDebug('validateOrder processOrderAfterValidation()');
-        $this->processOrderAfterValidation($cart, $codResultado);
+        $this->processOrderAfterValidation($cart, $codResultado, $idTransaccion);
        
         $this->writeToDebug('END validateOrder');
     }
@@ -315,12 +315,17 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
     }
 
 
-    private function processOrderAfterValidation($cart, $codResultado)
+    private function processOrderAfterValidation($cart, $codResultado, $idTransaccion)
     {
         $this->writeToDebug('INIT processOrderAfterValidation');
         $order = new Order(Order::getOrderByCartId($cart->id));
         if ($order->id) 
         {
+            // agrega la nota interna del pedido
+            $note = 'Pedido Tienda: ' . $order->reference . ' - Pedido Cetelem: ' . pSQL($idTransaccion);
+            $order->note = $note;
+            $order->save();
+
             $this->writeToDebug('processOrderAfterValidation codResultado');
             switch ($codResultado) 
             {
