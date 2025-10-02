@@ -447,9 +447,17 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
             'orderId' => $statusCode == 1 ? $orderID : null,
             'errorData' => $statusCode == 7 ? "Error processing transaction" : null,
         ];
-
-        header('Content-Type: application/json');
+        header('Content-Type: application/json');        
         echo json_encode($data);
+         PrestaShopLogger::addLog(
+            'Cetelem::CallBack -sendStatus() TIEMPO DE FINALIZACION: '.date('Y-m-d - H:i:s'),
+            1,
+            $statusCode,
+            'JSON',
+            $orderID,
+            true
+        );
+        $this->writeToDebug("FIN DE EJECUCION API : ".date('Y-m-d - H:i:s'));
         $this->writeToDebug('END sendStatus');
         exit;
     }
