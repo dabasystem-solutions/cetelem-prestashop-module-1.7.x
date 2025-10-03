@@ -47,6 +47,25 @@
     }
 
     {/literal}
+
+    {literal}
+    #infoFinanciacionCtl-combo
+    {
+        font-weight:bold !important;
+    }
+    .mostrarMasInfo b
+    {
+        font-weight:bold !important;
+    }
+    #infoFinanciacionCtl-combo b
+    {
+        font-weight:bold !important;
+    }
+
+    #spanTinTae-combo{font-weight:bold !important;}
+    {/literal}
+
+
 </style>
 <div class="clearfix"></div>
 <div id="calc_container">
