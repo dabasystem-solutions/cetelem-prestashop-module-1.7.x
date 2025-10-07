@@ -62,7 +62,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.7.1';
+        $this->version = '17.7.2';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => _PS_VERSION_];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
@@ -1883,6 +1883,7 @@ class CetelemPayment extends PaymentModule
                     top:10px;
                     right:25px;
                     z-index:9999;
+                    max-width:550px;
                 }
                 #cetelem-popover-container:hover
                 {
