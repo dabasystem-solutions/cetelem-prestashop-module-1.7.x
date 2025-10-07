@@ -49,20 +49,17 @@
     {/literal}
 
     {literal}
-    #infoFinanciacionCtl-combo
-    {
-        font-weight:bold !important;
-    }
+   
     .mostrarMasInfo b
     {
         font-weight:bold !important;
     }
-    #infoFinanciacionCtl-combo b
+    #infoFinanciacionCtl-combo b,
+    #infoFinanciacionCtl-combo b *
     {
         font-weight:bold !important;
     }
-
-    #spanTinTae-combo{font-weight:bold !important;}
+    
     {/literal}
 
 
