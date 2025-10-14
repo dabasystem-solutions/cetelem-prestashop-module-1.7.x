@@ -1390,17 +1390,30 @@ class CetelemPayment extends PaymentModule
 
     public function hookActionOrderStatusPostUpdate($params)
     {
+        $id_order = 0;
+        if (isset($params['id_order'])) {
+            $id_order = (int)$params['id_order'];
+        } elseif (isset($params['order']) && Validate::isLoadedObject($params['order'])) {
+            $id_order = (int)$params['order']->id;
+        }
+
         $order_state = isset($params['newOrderStatus']) ? $params['newOrderStatus'] : $params['orderStatus'];
         switch ($order_state->id) {
             case $this->cetelemStates->StateCetelemPreApproved():
                 $this->addPayment($params);
-                $this->sendCetelemEmail('cetelem_preapproved_credit', $params['id_order'], $params['newOrderStatus']);
+                if ($id_order) {
+                    $this->sendCetelemEmail('cetelem_preapproved_credit', $id_order, $params['newOrderStatus']);
+                }
                 break;
             case $this->cetelemStates->StateCetelemApproved():
-                $this->sendCetelemEmail('cetelem_credit_ok', $params['id_order'], $params['newOrderStatus']);
+                if ($id_order) {
+                    $this->sendCetelemEmail('cetelem_credit_ok', $id_order, $params['newOrderStatus']);
+                }
                 break;
             case $this->cetelemStates->StateCetelemDenied():
-                $this->sendCetelemEmail('cetelem_credit_ko', $params['id_order'], $params['newOrderStatus']);
+                if ($id_order) {
+                    $this->sendCetelemEmail('cetelem_credit_ko', $id_order, $params['newOrderStatus']);
+                }
                 /* To restore the quantity of each product and / or combination */
                 //(discommented again) we commented that on 2.5.0 version because we do it already in the overrides (check and get sure, otherwise we may be have to uncomment this again)
                 /*$order = new Order($params['id_order']);

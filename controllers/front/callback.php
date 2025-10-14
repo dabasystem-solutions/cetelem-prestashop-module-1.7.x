@@ -391,11 +391,17 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
             $this->writeToDebug('updateOrderState set new_state');
             $this->writeToDebug("updateOrderState newState == " . print_r($new_state, true));
 
-            $order->setCurrentState($new_state);
+            $this->writeToDebug('updateOrderState: Attempting OrderHistory update without email');
+            $history = new OrderHistory();
+            $history->id_order = (int)$order->id;
+            $history->id_order_state = (int)$new_state;
+            $history->change_log = true; // Para que se registre el cambio
+            $history->add(true); // El parámetro 'true' evita el envío de correo electrónico
 
-            $this->writeToDebug("Order state updated: Order ID {$order->id} -> State {$new_state}");
-            $this->writeToDebug('updateOrderState save()');
-            $order->save();
+            $this->writeToDebug("Order state updated: Order ID {$order->id} -> State {$new_state} (No Email)");
+            $this->writeToDebug('updateOrderState: Order state updated via OrderHistory.');
+            // $order->save() no es necesario si solo se actualiza el estado con OrderHistory::add()
+
 
         } catch (Exception $e) {
             $this->writeToDebug('updateOrderState ERRCatch');
