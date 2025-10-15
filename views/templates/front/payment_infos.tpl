@@ -89,9 +89,10 @@
 
     color = '{$color}';//'#000000';//text_color_cetelem;//
 
-    bloquearImporte = false,//cetelem_amount_block;//FALTA
+    bloquearImporte = false;//cetelem_amount_block;//FALTA
 
-        fontSize = {$fontSize};//12;//font_size_cetelem;//
+    //var fontSize = {$fontSize};//12;//font_size_cetelem;//
+    var fontSize = 12;
 
     calc_type = '{$calc_type}';//'/eCommerceCalculadora/resources/js/eCalculadoraCetelemCombo.js';
     
