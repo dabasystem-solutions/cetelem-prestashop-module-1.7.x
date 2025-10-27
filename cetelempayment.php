@@ -62,7 +62,7 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.7.3';
+        $this->version = '17.7.4';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => _PS_VERSION_];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
@@ -1280,29 +1280,32 @@ class CetelemPayment extends PaymentModule
 
     public function hookDisplayReassurance($params)
     {
-        if (Configuration::get('CETELEM_CALC_POSITION') == 0) {
-            return $this->calculatorHookRenderer();
-        } else {
-            return;
-        }
+        return $this->calculatorHookRenderer();
+        // if (Configuration::get('CETELEM_CALC_POSITION') == 0) {
+        //     return $this->calculatorHookRenderer();
+        // } else {
+        //     return;
+        // }
     }
 
     public function hookDisplayProductAdditionalInfo($params)
     {
-        if (Configuration::get('CETELEM_CALC_POSITION') == 1) {
-            return $this->calculatorHookRenderer();
-        } else {
-            return;
-        }
+        return $this->calculatorHookRenderer();
+        // if (Configuration::get('CETELEM_CALC_POSITION') == 1) {
+        //     return $this->calculatorHookRenderer();
+        // } else {
+        //     return;
+        // }
     }
 
-       public function hookDisplayCalculadoraCetelem($params)
+    public function hookDisplayCalculadoraCetelem($params)
     {
-        if (Configuration::get('CETELEM_CALC_POSITION') == 2) {
-            return $this->calculatorHookRenderer();
-        } else {
-            return;
-        }
+        return $this->calculatorHookRenderer();
+        // if (Configuration::get('CETELEM_CALC_POSITION') == 2) {
+        //     return $this->calculatorHookRenderer();
+        // } else {
+        //     return;
+        // }
     }
 
     public function calculatorHookRenderer()
