@@ -6,6 +6,8 @@ Contact: info@dabasystem.com
 -----------------------------------------
 Historic changes for Cetelem
 -----------------------------------------
+VERSION 20.0.1
+[-] MO: Se actualiza los métodos de traer el importe, así como los carritos. Actualización de hook, y funciones compatibles con Prestashop 9.
 
 VERSION 17.6.4
 [-] MO: Corrección de errores, sistema de registro de transacciones y traducción de cadenas.

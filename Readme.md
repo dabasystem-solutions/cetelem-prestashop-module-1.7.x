@@ -1,6 +1,6 @@
 ## Synopsis
 
-Module developed to integrate Cetelem Payments in PrestaShop 1.5 and 1.6
+Module developed to integrate Cetelem Payments in PrestaShop 1.5 and 1.6, 1.8, 1.9, 8 and 9.
 
 ## Installation
 
