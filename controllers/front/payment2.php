@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+
 class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
@@ -180,8 +181,8 @@ class CetelempaymentPayment2ModuleFrontController extends ModuleFrontController
             'this_path' => $this->module->getPathUri(),
             'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' . $this->module->name . '/'
         ]);
-
-        $albaran = Order::getOrderByCartId((int)$cart->id);
+        $albaran = CetelemPayment::getOrderByCartId((int)$cart->id);
+       
         if (Configuration::get('CETELEM_ORDER_CREATION')) {
             if ($cart->id_customer == 0 || $cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active) {
                 Tools::redirect('index.php?controller=order&step=1');

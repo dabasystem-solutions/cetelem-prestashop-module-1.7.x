@@ -141,7 +141,8 @@ private function isTransactionDuplicate($idTransaccion, $codigo, $idCart)
         $id_cart = $this->getIdCart($idTransaccion);
         $cart = new Cart($id_cart);
       
-        $existing_order = Order::getOrderByCartId($id_cart);
+        $existing_order = CetelemPayment::getOrderByCartId((int)$id_cart);
+        
 
         if ($existing_order) {
             $this->writeToLog("Order already exists for Cart ID: {$cart->id}");

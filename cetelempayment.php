@@ -1498,15 +1498,17 @@ class CetelemPayment extends PaymentModule
         if ($order->getCurrentOrderState()->id != Configuration::get('PS_OS_ERROR')) {
             $this->smarty->assign('status', 'ok');
         }
+        
+        $this->smarty->assign([
+            'id_order'  => $order->id,
+            'reference' => $order->reference,
+            'params'    => $params,
+            'total'     => $this->formatPrice(
+                $order->getOrdersTotalPaid(),
+                $currency
+            ),
+        ]);
 
-        $this->smarty->assign(
-            array(
-                'id_order' => $order->id,
-                'reference' => $order->reference,
-                'params' => $params,
-                'total' => Tools::displayPrice($order->getOrdersTotalPaid(), $currency, false),
-            )
-        );
 
         return $this->display(__FILE__, 'views/templates/hook/confirmation.tpl');
     }
@@ -1913,11 +1915,14 @@ public function addPayment($params)
         ) != '')) {
             $text_payment = Configuration::get('CETELEM_LEGAL_CHECKOUT');
         }
-
+         $currency = $this->context->currency;
         $total = $this->trans(
             '%amount% (tax incl.)',
             array(
-                '%amount%' => Tools::displayPrice($cart->getOrderTotal(true, Cart::BOTH)),
+                '%amount%' => $this->formatPrice(
+        $cart->getOrderTotal(true, Cart::BOTH),
+        $currency
+    ), 
             ),
             'Modules.Cetelem.Admin'
         );
@@ -2039,5 +2044,27 @@ public function addPayment($params)
             }
         }
         return false;
+    }
+    protected function formatPrice(float $amount, $currency = null): string
+{
+    if (version_compare(_PS_VERSION_, '9.0.0', '>=')) {
+        $context = Context::getContext();
+
+        return $context->getCurrentLocale()->formatPrice(
+            $amount,
+            $currency instanceof Currency
+                ? $currency->iso_code
+                : $context->currency->iso_code
+        );
+    }
+
+    return Tools::displayPrice($amount, $currency);
+}
+ public static function getOrderByCartId($id_cart)
+    {
+        if (version_compare(_PS_VERSION_, '9.0.0', '>=')) {
+        return Order::getIdByCartId($id_cart);
+        }
+        return Order::getOrderByCartId($id_cart);
     }
 }
