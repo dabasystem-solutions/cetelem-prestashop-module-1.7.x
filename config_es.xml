@@ -2,7 +2,7 @@
 <module>
     <name>cetelempayment</name>
     <displayName><![CDATA[ Cetelem]]></displayName>
-    <version><![CDATA[17.6.7]]></version>
+    <version><![CDATA[20.0.1]]></version>
     <description><![CDATA[Los clientes pueden pagar con cr&eacute;dito.]]></description>
     <author><![CDATA[Dabasystem solutions - https://www.dabasystem.com/]]></author>
     <tab><![CDATA[payments_gateways]]></tab>

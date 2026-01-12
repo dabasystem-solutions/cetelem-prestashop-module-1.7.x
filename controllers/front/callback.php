@@ -168,7 +168,8 @@ class CetelemPaymentCallbackModuleFrontController extends ModuleFrontController
         $id_cart = $this->getIdCart($idTransaccion);
         $cart = new Cart($id_cart);
       
-        $existing_order = Order::getOrderByCartId($id_cart);
+        $existing_order = CetelemPayment::getOrderByCartId((int)$id_cart);
+        
 
         if ($existing_order) {
             $this->writeToDebug('processTransaction EXISTING ORDER == TRUE');

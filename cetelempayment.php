@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  2007-2024 PrestaShop
  *
@@ -25,6 +26,7 @@
  */
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -62,14 +64,14 @@ class CetelemPayment extends PaymentModule
     {
         $this->name = 'cetelempayment';
         $this->tab = 'payments_gateways';
-        $this->version = '17.7.4';
+        $this->version = '20.0.1';
         $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => _PS_VERSION_];
         $this->author = 'Dabasystem solutions - https://www.dabasystem.com/';
         $this->need_instance = 0;
         $this->bootstrap = true;
         $this->module_key = '7799a4b29a111619f24530986eef6df8';
-        
-        
+
+
 
         parent::__construct();
         require_once __DIR__ . '/classes/CetelemStates.php';
@@ -79,7 +81,6 @@ class CetelemPayment extends PaymentModule
         $this->showEnquotas = Configuration::get('CETELEM_SHOWENCUOTAS');
         $this->showCetelem = Configuration::get('CETELEM_SHOWCETELEM');
         require_once __DIR__ . '/classes/RegistroUsuarioEcomerce.php';
-
     }
 
     public function install()
@@ -164,7 +165,7 @@ class CetelemPayment extends PaymentModule
                 ]
             ];
             if (filter_var($url, FILTER_VALIDATE_URL)) {
-            $content = Tools::file_get_contents($url, 0, stream_context_create($arrContextOptions));
+                $content = Tools::file_get_contents($url, 0, stream_context_create($arrContextOptions));
             }
             if ($content) {
                 $xml = new SimpleXMLElement($content);
@@ -187,7 +188,7 @@ class CetelemPayment extends PaymentModule
             if (!is_array($selected_carriers)) {
                 $selected_carriers = [];
             }
-   
+
             Configuration::updateValue('CETELEM_CARRIERS', json_encode($selected_carriers));
             Configuration::updateValue('CETELEM_MOTO', Tools::getValue('CETELEM_MOTO'));
             Configuration::updateValue('CETELEM_ENV', Tools::getValue('CETELEM_ENV'));
@@ -209,7 +210,7 @@ class CetelemPayment extends PaymentModule
             Configuration::updateValue('CETELEM_SHOWCETELEM', Tools::getValue('CETELEM_SHOWCETELEM'));
             Configuration::updateValue('CETELEM_SHOWENCUOTAS', Tools::getValue('CETELEM_SHOWENCUOTAS'));
             Configuration::updateValue('CETELEM_PRODUCTS', Tools::getValue('CETELEM_PRODUCTS'));
-            
+
             $cetelemInfo = array();
             foreach (Language::getLanguages() as $lang) {
                 $cetelemInfo[$lang['id_lang']] = htmlspecialchars(
@@ -391,7 +392,7 @@ class CetelemPayment extends PaymentModule
         $helper->toolbar_scroll = true;
         $helper->title = $this->displayName;
         $helper->submit_action = 'submitCetelemMotoSettings';
-  
+
         if (version_compare(_PS_VERSION_, '1.6', '<')) {
             $type = 'radio';
             $msg = 'desc';
@@ -464,7 +465,7 @@ class CetelemPayment extends PaymentModule
 
     public function displayFormConfig()
     {
-         $languages = Language::getLanguages(false);
+        $languages = Language::getLanguages(false);
 
         foreach ($languages as $k => $language) {
             $languages[$k]['is_default'] = (int)$language['id_lang'] == Configuration::get('PS_LANG_DEFAULT');
@@ -494,7 +495,7 @@ class CetelemPayment extends PaymentModule
             false, // No agrupados por zona
             null   // Obtener todos los transportistas
         );
-    
+
         $carrier_options = [];
         foreach ($carriers as $carrier) {
             $carrier_options[] = [
@@ -506,7 +507,7 @@ class CetelemPayment extends PaymentModule
         if (!is_array($selected_carriers)) {
             $selected_carriers = [];
         }
-       
+
         $helper = new HelperForm();
         $helper->module = $this;
         $helper->name_controller = 'cetelem';
@@ -520,7 +521,7 @@ class CetelemPayment extends PaymentModule
         $helper->title = $this->displayName;
         $helper->submit_action = 'submitCetelemSettings';
 
-  
+
         if (version_compare(_PS_VERSION_, '1.6', '<')) {
             $type = 'radio';
             $msg = 'desc';
@@ -556,7 +557,7 @@ class CetelemPayment extends PaymentModule
                             'label' => $this->l('No')
                         )
                     ),
-                ),                
+                ),
                 array(
                     'type' => $type,
                     'label' => $this->l('Activate Cetelem payment method'),
@@ -661,7 +662,7 @@ class CetelemPayment extends PaymentModule
                     'lang' => false,
                     'suffix' => '€',
                     'col' => 4,
-                ),                
+                ),
                 array(
                     'type' => $type,
                     'label' => $this->l('Display calculator in product page'),
@@ -684,7 +685,7 @@ class CetelemPayment extends PaymentModule
                             'label' => $this->l('Disabled')
                         )
                     ),
-                ),               
+                ),
                 array(
                     'type' => $type,
                     'label' => $this->l('Block amount (only used for slider calc type)'),
@@ -704,7 +705,7 @@ class CetelemPayment extends PaymentModule
                             'label' => $this->l('Disabled')
                         )
                     ),
-                ),                
+                ),
                 array(
                     'type' => 'select',
                     'label' => $this->l('Select the collection point'),
@@ -723,7 +724,7 @@ class CetelemPayment extends PaymentModule
                 'title' => $this->l('Save'),
                 'class' => 'button pull-right'
             ),
-        );        
+        );
         $helper->fields_value['CETELEM_ENV'] = Configuration::get('CETELEM_ENV');
         $helper->fields_value['CETELEM_IPS'] = Configuration::get('CETELEM_IPS');
         //$helper->fields_value['CETELEM_ORDER_CREATION'] = Configuration::get('CETELEM_ORDER_CREATION');
@@ -756,7 +757,6 @@ class CetelemPayment extends PaymentModule
     public function hookHeader()
     {
         $this->context->controller->addJS($this->_path . '/views/js/ajax-cetelem.js');
-
     }
 
     public function hookDisplayDashboardTop()
@@ -767,7 +767,6 @@ class CetelemPayment extends PaymentModule
 
         //Miramos de registrar el usuario actual como activo de Cetelem
         $this->getionarUsuarioEcomenrce();
-
     }
 
     public function hookDisplayHeader()
@@ -1071,10 +1070,10 @@ class CetelemPayment extends PaymentModule
         if (!is_array($selected_carriers)) {
             return false;
         }
-    
+
         return in_array($id_carrier, $selected_carriers);
     }
-    
+
     public function getGPaymentOption($fields, $encuotas = false)
     {
         $arrayPayments = array();
@@ -1134,14 +1133,11 @@ class CetelemPayment extends PaymentModule
             $material = '333';
         }
         $callback = null;
-        
-        if ($encuotas) 
-        {
-            $callback = $this->context->link->getModuleLink( $this->name, 'callback', array('encuotas' => 1));
-        }
-        else
-        {
-            $this->context->link->getModuleLink( $this->name, 'callback');
+
+        if ($encuotas) {
+            $callback = $this->context->link->getModuleLink($this->name, 'callback', array('encuotas' => 1));
+        } else {
+            $this->context->link->getModuleLink($this->name, 'callback');
         }
 
         $this->context->smarty->assign(array('addCetelemScript' => true, 'material' => $material));
@@ -1198,7 +1194,7 @@ class CetelemPayment extends PaymentModule
                     'ReturnURL' => [
                         'name' => 'ReturnURL',
                         'type' => 'hidden',
-                        'value' => $this->context->link->getModuleLink( $this->name, 'validation'),
+                        'value' => $this->context->link->getModuleLink($this->name, 'validation'),
                     ],
                     'Tratamiento' => [
                         'name' => 'Tratamiento',
@@ -1218,7 +1214,7 @@ class CetelemPayment extends PaymentModule
                         //'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateFirstLastName($fields['address']->lastname) : '',
                         'value' => $fields['address']->lastname ? $fields['address']->lastname : '',
                     ],
-                     'FechaNacimiento' => [
+                    'FechaNacimiento' => [
                         'name' => 'FechaNacimiento',
                         'type' => 'hidden',
                         //'value' => $fields['loaded_customer'] ? CetelemFieldValidator::validateBirthday($fields['birthday']) : '',
@@ -1236,11 +1232,11 @@ class CetelemPayment extends PaymentModule
                         //'value' => $fields['loaded_address'] ? CetelemFieldValidator::validateCity($fields['address']->city) : '',
                         'value' => $fields['address']->city ? $fields['address']->city : '',
                     ],
-                'CodigoPostalEnvio' => [
-                    'name' => 'CodigoPostalEnvio',
-                    'type' => 'hidden',
-                    'value' => $this->shouldOverridePostalCode($this->context->cart->id_carrier) ? '00000' : $fields['address']->postcode,
-                ],
+                    'CodigoPostalEnvio' => [
+                        'name' => 'CodigoPostalEnvio',
+                        'type' => 'hidden',
+                        'value' => $this->shouldOverridePostalCode($this->context->cart->id_carrier) ? '00000' : $fields['address']->postcode,
+                    ],
                     'Email' => [
                         'name' => 'Email',
                         'type' => 'hidden',
@@ -1249,7 +1245,7 @@ class CetelemPayment extends PaymentModule
                     ],
                 ]
             );
-          
+
         return $externalOption;
     }
 
@@ -1266,14 +1262,16 @@ class CetelemPayment extends PaymentModule
             $this->smarty->assign('status', 'ok');
         }
 
-        $this->smarty->assign(
-            array(
-                'id_order' => $order->id,
-                'reference' => $order->reference,
-                'params' => $params,
-                'total' => Tools::displayPrice($order->getOrdersTotalPaid(), $currency, false),
-            )
-        );
+        $this->smarty->assign([
+            'id_order'  => $order->id,
+            'reference' => $order->reference,
+            'params'    => $params,
+            'total'     => $this->formatPrice(
+                $order->getOrdersTotalPaid(),
+                $currency
+            ),
+        ]);
+
 
         return $this->display(__FILE__, 'views/templates/hook/confirmation.tpl');
     }
@@ -1423,10 +1421,10 @@ class CetelemPayment extends PaymentModule
             : (isset($params['id_order']) ? new Order((int)$params['id_order']) : null);
 
         $logFile = __DIR__ . '/cetelem_payment_log.txt';
-        $log = function($title, $data = []) use ($logFile) {
+        $log = function ($title, $data = []) use ($logFile) {
             file_put_contents(
                 $logFile,
-                '['.date('Y-m-d H:i:s')."] $title\n".print_r($data, true)."\n---\n",
+                '[' . date('Y-m-d H:i:s') . "] $title\n" . print_r($data, true) . "\n---\n",
                 FILE_APPEND
             );
         };
@@ -1438,8 +1436,8 @@ class CetelemPayment extends PaymentModule
 
         $transactionId = (string) Db::getInstance()->getValue('
             SELECT `transaction_id`
-            FROM `'._DB_PREFIX_.'cetelem_transactions`
-            WHERE `id_cart` = '.(int)$order->id_cart.'
+            FROM `' . _DB_PREFIX_ . 'cetelem_transactions`
+            WHERE `id_cart` = ' . (int)$order->id_cart . '
             ORDER BY `date_add` DESC
         ');
         if (!$transactionId) {
@@ -1457,7 +1455,7 @@ class CetelemPayment extends PaymentModule
             'payment_method'  => pSQL('Financiación con Cetelem'),
             'conversion_rate' => (float)$order->conversion_rate ?: 1.000000,
             'transaction_id'  => pSQL($transactionId !== '' ? $transactionId : '-'),
-            'card_number'     => '-',  
+            'card_number'     => '-',
             'card_brand'      => '-',
             'card_expiration' => '-',
             'card_holder'     => '-',
@@ -1465,17 +1463,17 @@ class CetelemPayment extends PaymentModule
         ];
 
 
-            $idOrderPayment = (int)Db::getInstance()->getValue('
+        $idOrderPayment = (int)Db::getInstance()->getValue('
                 SELECT id_order_payment
-                FROM `'._DB_PREFIX_.'order_payment`
-                WHERE order_reference = "'.pSQL((string)$order->reference).'"
+                FROM `' . _DB_PREFIX_ . 'order_payment`
+                WHERE order_reference = "' . pSQL((string)$order->reference) . '"
                 ORDER BY id_order_payment DESC
                 
             ');
-        
+
 
         if ($idOrderPayment) {
-            $ok = Db::getInstance()->update('order_payment', $row, 'id_order_payment='.(int)$idOrderPayment, true, false);
+            $ok = Db::getInstance()->update('order_payment', $row, 'id_order_payment=' . (int)$idOrderPayment, true, false);
             $log('ADD PAYMENT - UPDATE', [
                 'id_order_payment' => $idOrderPayment,
                 'ok' => $ok,
@@ -1539,9 +1537,9 @@ class CetelemPayment extends PaymentModule
     {
         $order = new Order((int)$params['id_order']);
         //Si no es de CETELEM, salimos
-        if ($order->payment != 'cetelempayment'){
+        if ($order->payment != 'cetelempayment') {
             return;
-        }       
+        }
         $tmp_order = new Order((int)$params['id_order']);
         $tmp_payment = $tmp_order->payment;
         if ($tmp_payment == 'cetelempayment' && (int)$tmp_order->current_state == (int)Configuration::get('PS_OS_CANCELED')) {
@@ -1686,11 +1684,14 @@ class CetelemPayment extends PaymentModule
         ) != '')) {
             $text_payment = Configuration::get('CETELEM_LEGAL_CHECKOUT');
         }
-
+        $currency = $this->context->currency;
         $total = $this->trans(
             '%amount% (tax incl.)',
             array(
-                '%amount%' => Tools::displayPrice($cart->getOrderTotal(true, Cart::BOTH)),
+                '%amount%' => $this->formatPrice(
+                    $cart->getOrderTotal(true, Cart::BOTH),
+                    $currency
+                ),
             ),
             'Modules.Cetelem.Admin'
         );
@@ -1722,7 +1723,7 @@ class CetelemPayment extends PaymentModule
                 ]
             ];
             if (filter_var($url, FILTER_VALIDATE_URL)) {
-            $content = Tools::file_get_contents($url, 0, stream_context_create($arrContextOptions));
+                $content = Tools::file_get_contents($url, 0, stream_context_create($arrContextOptions));
             }
             if ($content) {
                 $xml = new SimpleXMLElement($content);
@@ -1813,213 +1814,26 @@ class CetelemPayment extends PaymentModule
         }
         return false;
     }
+    protected function formatPrice(float $amount, $currency = null): string
+    {
+        if (version_compare(_PS_VERSION_, '9.0.0', '>=')) {
+            $context = Context::getContext();
 
-     //Recoge la version del módulo de cetelem instalada
-    /**
-     * Obtiene la versión del módulo de Cetelem instalado
-     * @return string|null Devuelve la versión del módulo o null si no está instalado
-    */
-    private function getVersionCetelem()
-    {
-        if (\Module::isInstalled('cetelempayment')) 
-        {
-            $cetelemModule = \Module::getInstanceByName('cetelempayment');
-            return $cetelemModule->version;
-        } 
-        return null;
-    }
-
-    private function isInPaymentMethodsSection()
-    {
-        return isset($_GET['controller']) && $_GET['controller'] === 'AdminPayment';
-    }
-    /**
-     * Consulta la API de GitHub para revisar si hay una nueva versión del módulo
-     * @param string $versionActual versión actual del módulo
-     * @return array|null Devuelve un array con la información de la nueva versión o null
-    */
-    private function checkNuevaVersionCetelem($versionActual)
-    {
-        $url = 'https://api.github.com/repos/dabasystem-solutions/cetelem-prestashop-module-1.7.x/releases/latest';
-        $opts = [
-            "http" => [
-                "method" => "GET",
-                "header" => "User-Agent: PrestaShop\r\n"
-            ]
-        ];
-        $context = stream_context_create($opts);
-        $json = @file_get_contents($url, false, $context);
-        if ($json === false) {
-            return null;
+            return $context->getCurrentLocale()->formatPrice(
+                $amount,
+                $currency instanceof Currency
+                    ? $currency->iso_code
+                    : $context->currency->iso_code
+            );
         }
-        $data = json_decode($json, true);
-        return [
-            'version' => $data['tag_name'] ?? null,
-            'mensaje' => $data['body'] ?? null,
-            'titulo'  => $data['name'] ?? null,
-            'actual'  => $versionActual
-        ];
+
+        return Tools::displayPrice($amount, $currency);
     }
-    /**
-     * Genera un popover para que sea visible en el backofice
-     * 
-     * @param array $res array asociativo con la información reportada de checkNuevaVersionCetelem()
-     * @return void
-    */
-    private function mostrarMensajeVersionNueva($res)
+    public static function getOrderByCartId($id_cart)
     {
-        echo '
-            <style>
-                #cetelem-popover-btn,
-                #cetelem-popover-btn:hover,
-                #cetelem-popover-btn:focus,
-                #cetelem-popover-btn:active 
-                {
-                    background-color: white;
-                    border: solid 2px #269234;
-                    border-radius: 0px;
-                    padding: 5%;
-                }
-                #cetelem-popover-container
-                {
-                    position:absolute;
-                    top:10px;
-                    right:25px;
-                    z-index:9999;
-                    max-width:550px;
-                }
-                #cetelem-popover-container:hover
-                {
-                    cursor: default;
-                }
-                .titulo-aviso-cetelem-update
-                {
-                    font-size: 18pt;
-                    font-weight: 800;
-                }
-                .mensaje-aviso-cetelem-update
-                {
-                    display:flex; 
-                    flex-flow:column; 
-                    gap:20px;
-                    margin-top: 10%;
-                }
-                #info-nuevo-modulo-cetelem
-                {
-                    font-size: 16pt;
-                    font-weight: 600;
-                }
-                .btn-cetelem, .btn-cetelem:hover,
-                {                    
-                    color: white !important;
-                    transition: color 0.15s 
-                    ease-in-out, background-color 0.15s 
-                    ease-in-out, border-color 0.15s 
-                    ease-in-out, box-shadow 0.15s 
-                    ease-in-out, -webkit-box-shadow 0.15s 
-                    ease-in-out;
-                }
-                .btn-cetelem-modulos
-                {                
-                    color:white !important;
-                    background-color: #269234;
-                    border-color: #269234;
-                }
-                .btn-cetelem-modulos:hover
-                {
-                    color:white !important;
-                    background-color: #2fb041ff;
-                    border-color: #2fb041ff;
-                }
-                
-                #contenedor-botones-aviso-cetelem
-                {
-                    display: flex;
-                    flex-flow: row;                    
-                    margin-top: 10%;
-                    justify-content: center;
-                    gap: 7%;                    
-                }
-                #contenedor-botones-aviso-cetelem a
-                {
-                    border-radius: 10px !important;
-                    padding: 2%;
-                    padding-left: 5%;
-                    padding-right: 5%;
-                }
-            </style>
-            <div id="cetelem-popover-container" >
-                <div id="cetelem-popover-btn" class="btn" data-toggle="popover">
-                    <h3 class="titulo-aviso-cetelem-update" >Hay una nueva actualización</h3>
-                    <h3 class="titulo-aviso-cetelem-update" >módulo Cetelem: '. htmlspecialchars($res["version"]).'</h3>
-                    <p class="mensaje-aviso-cetelem-update" >
-                        <span id="info-nuevo-modulo-cetelem">' . htmlspecialchars($res["mensaje"]) . '</span>
-                        <div id="contenedor-botones-aviso-cetelem" >
-                            <a class="btn btn-cetelem btn-cetelem-modulos" 
-                            href="https://moduloscetelem.dabasystem.com" target="_blank">
-                                Ir a módulos Cetelem
-                            </a>
-                            <a class="btn btn-secondary btn-cetelem" 
-                            onclick="
-                                document.getElementById(\'cetelem-popover-container\').style.display = \'none\';
-                            " >Cerrar</a>
-                        </div>
-                    </p>
-                </div>
-            </div>
-            <script>
-                (function(){
-                    var popoverBtn = document.getElementById("cetelem-popover-btn");
-                    if (window.jQuery && typeof jQuery.fn.popover === "function") {
-                        jQuery(function($){
-                            $("#cetelem-popover-btn").popover("show");
-                            setTimeout(function(){
-                                $("#cetelem-popover-container").fadeOut();
-                            }, 1000000);
-                        });
-                    }
-                })();
-            </script>
-        ';
-    }
-
-    private function controlAlertVersionCetelem()
-    {        
-        if(isset($_COOKIE['cetelem_version_notice']))
-        {
-            //Ya se ha mostrado el mensaje
-            return; 
+        if (version_compare(_PS_VERSION_, '9.0.0', '>=')) {
+            return Order::getIdByCartId($id_cart);
         }
-        // 2. Revisar la versión actual del módulo
-        $versionActual = $this->getVersionCetelem();
-        // 3. Revisar si hay una versión nueva
-        $versionGit = $this->checkNuevaVersionCetelem($versionActual);
-
-        if ($versionGit && $versionGit['version'] != $versionActual) 
-        {
-            // Mostrar mensaje de nueva versión
-            $this->mostrarMensajeVersionNueva($versionGit);
-            // Guardar cookie para no mostrarlo en 24 horas            
-            setcookie('cetelem_version_notice', time(), time() + 3600);//una hora
-        }
-    }
-
-    /**
-     *Se encarga de gestionar y registrar el usuario de BackOffice actual como activo de Cetelem
-     * @return void
-    */
-    private function getionarUsuarioEcomenrce()
-    {
-        /*/iniciamos el proceso de registro del usuario
-        //* Se revisa si el usuario ya está registrado
-        //* si no lo está , se intentará registrar
-        //* Si ya está registrado, se revisa su estado y si esta como no activo, se modifica por PUT
-        //* Si el usuario esta activo, no se hace nada
-        */
-        RegistroUsuarioEcomerce::registrarUsuarioEcomerceCetelem
-        (
-            $this->context->employee->firstname." ".$this->context->employee->lastname, 
-            $this->context->employee->email        
-        );
+        return Order::getOrderByCartId($id_cart);
     }
 }
