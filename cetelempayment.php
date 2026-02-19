@@ -35,12 +35,12 @@ class CetelemPayment extends PaymentModule
     protected $output = '';
 
     const CETELEM_URL_TEST_CONNECTION = 'https://test.cetelem.es/eCommerceLite/configuracion.htm';
-    const CETELEM_URL_CONNECTION = 'https://www.cetelem.es/eCommerceLite/configuracion.htm';
+    const CETELEM_URL_CONNECTION = 'https://ecommerce.cetelem.es/eCommerceLite/configuracion.htm';
     /* MOTO */
     const CETELEM_URL_TEST_MOTO_CONNECTION = 'https://test.cetelem.es/eCommerceLite/moto/configuracion.htm';
-    const CETELEM_URL_MOTO_CONNECTION = 'https://www.cetelem.es/eCommerceLite/moto/configuracion.htm';
+    const CETELEM_URL_MOTO_CONNECTION = 'https://ecommerce.cetelem.es/eCommerceLite/moto/configuracion.htm';
 
-    const CETELEM_URL_NEWCONNECTION = 'https://www.cetelem.es/eCommerceLite/enCuotas/configuracion.htm';
+    const CETELEM_URL_NEWCONNECTION = 'https://ecommerce.cetelem.es/eCommerceLite/enCuotas/configuracion.htm';
     const CETELEM_URL_TEST_NEWCONNECTION = 'https://test.cetelem.es/eCommerceLite/enCuotas/configuracion.htm';
 
     const CETELEM_URL_SCRIPT = 'https://www.cetelem.es';
@@ -48,7 +48,7 @@ class CetelemPayment extends PaymentModule
     const CETELEM_URL_CMS = 'https://www.cetelem.es/contenidos/ecommerce/landing-text.js';
     const CETELEM_URL_CMS_PLAIN = 'https://www.cetelem.es/contenidos/ecommerce/info-plain.js?partner=';
     const URL_CSV_TIN_TAE = 'http://ecreditnow.es/CSV/partners/';
-    const URL_CSV_CALC_LEGAL = 'https://www.cetelem.es/eCommerceCalculadora/cetelem/legales.htm?codCentro=';
+    const URL_CSV_CALC_LEGAL = 'https://eCommerceCalculadora.cetelem.es/eCommerceCalculadora/cetelem/legales.htm?codCentro=';
     const URL_CSV_CAMPAIGN = 'http://ecreditnow.es/CSV/campaigns/';
     const CETELEM_CSV_NORMAL_TIN_INDEX = 1;
     const CETELEM_CSV_NORMAL_TAE_INDEX = 0;
