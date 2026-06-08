@@ -1147,6 +1147,18 @@ class CetelemPayment extends PaymentModule
     {
         $id_language = Tools::strtoupper($this->context->language->iso_code);
         $cart = $params['cart'];
+        $showCetelem = (bool) Configuration::get('CETELEM_SHOWCETELEM');
+        $showEnquotas = (bool) Configuration::get('CETELEM_SHOWENCUOTAS');
+        $forcePrimaryOption = !$showCetelem && !$showEnquotas;
+
+        // Fallback for shops that have the module installed but have not
+        // explicitly enabled either payment mode yet. In that case we show
+        // the main option unconditionally so the checkout integration can be
+        // verified in PS 8.2 without depending on back-office config.
+        if ($forcePrimaryOption) {
+            $showCetelem = true;
+        }
+
         $ano = date('Y');
         $ano = Tools::substr($ano, Tools::strlen($ano) - 1, 1);
         $ano1 = date('Y');
@@ -1206,9 +1218,11 @@ class CetelemPayment extends PaymentModule
         $payment_options = array();
 
         $orderTotal = $this->context->cart->getOrderTotal(true, Cart::BOTH);
-        if ($orderTotal >= Configuration::get('CETELEM_MIN_AMOUNT') && $this->showCetelem)
+        if (($forcePrimaryOption || $orderTotal >= Configuration::get('CETELEM_MIN_AMOUNT')) && $showCetelem) {
             $payment_options[] = $this->getGPaymentOption($fields);
-        if ($this->showEnquotas && $orderTotal >= Configuration::get('CETELEM_MIN_ENQUOTAS')) {
+        }
+
+        if ($showEnquotas && $orderTotal >= Configuration::get('CETELEM_MIN_ENQUOTAS')) {
 
             $maxAmount = 1000;
             $dateUpd = Db::getInstance()->getValue('
